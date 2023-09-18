@@ -1,0 +1,47 @@
+To initialize node_moudles, we write the following commans:
+    $ npm init 
+
+
+This will create a package.json that has the basic info about the project
+------
+To install npm package we use the following command: 
+    $ npm install <package-name>
+
+there are two types of packages, "dependencies" & "devDependencies" 
+The first one, our application depends on it 
+but the second one, we use it just to develop out application.
+
+To specify that some package is for development  ===>  use "--save-dev" after package name
+------
+After we install some node modules, we will find that there is a folder added "node_moudles"
+that includes all dependencies of our application,
+There is many dependencies that we didn't install, but some of them are dependencies of the installed dependencies.
+------
+To install some package globally on your machine so that you don't have to reinstall it on your future projects.
+    $ npm i <package-name> --global
+    // i is a short for "install"
+------
+major_version . minor_version . patch_version
+patch_version is only intended to fix bugs.
+minor_version is for some new features in the package but not including breaking changes.
+major_version is for huge new release which can have breaking changes.
+"^1.18.11"
+-------
+the symbol ^ ==> means that we accept updates in patch and minor releases
+The symbol ~ ==> only accepts patch releases
+-------
+USE: 
+ $ npm outdated 
+to list the outdated packages in your project
+-------
+to specify a specific version for some package
+$ npm install <package_name>@version
+$ npm install slugify@1.0.0
+-------
+    $npm update <package-name>
+to update the current version to the wanted one based on ~ or ^ sybmols 
+-------
+To uninstall some package:
+    $ npm uninstall <package-name>
+it will be deleted from node_moudles & also from dependencies from package.json
+------- 
