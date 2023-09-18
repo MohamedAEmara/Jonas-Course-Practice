@@ -49,28 +49,38 @@ const dataObj = JSON.parse(data);
 
 const server = http.createServer((req, res) => {
     const pathName = req.url;
+    // console.log(req.url);
+    // console.log(url.parse(req.url, true));
+    // console.log(url.parse());
 
+    const { query, pathname } = url.parse(req.url, true);
+    console.log('path name = ' + pathname);     // pathname = "/product" for example
+    console.log(query);
     // OVERVIEW page.
-    if (pathName  === '/' || pathName === 'overview') {
+    if (pathname  === '/' || pathname === 'overview') {
         res.writeHead(200, { 'Content-type': 'text/html' });
 
         // We have to loop over the array of objects from "dataObj"
         // to display them in the "overview" page.
         const cardsHtml = dataObj.map(el => replaceTemplate(tempCard, el)); 
         
-        console.log(cardsHtml);     // we have some stuff replaced successfully in the terminal
+        // console.log(cardsHtml);     // we have some stuff replaced successfully in the terminal
 
         const output = tempOverview.replace('%PRODUCT_CARDS%', cardsHtml);
         res.end(output);
 
     // PRODUCT page.
-    } else if (pathName === '/product') {
-        res.end('This is the product');
-
-         
-
+    } else if (pathname === '/product') {
+        console.log(query);
+        // res.end('This is the product');
+        // First, we have to determine which one is the product we wanna display
+        const product = dataObj[query['id']];
+        // console.log(dataObj[query['id']]);
+        // console.log('----------------------');
+        output = replaceTemplate(tempProduct, product);
+        res.end(output);
     // API.    
-    } else if (pathName === '/api') {
+    } else if (pathname === '/api') {
         res.writeHead(200, { 'Content-type': 'application/json' });
         res.end(data);
 
