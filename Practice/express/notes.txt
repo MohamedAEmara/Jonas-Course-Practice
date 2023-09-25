@@ -1,0 +1,69 @@
+// ======================= Installing Postman ========================== //
+
+Before installing Express, we will install a very useful tool which is "postman"
+Postman is a beautiful tool that allows us to do "API testing"
+
+When we install it and open the application, it looks like a browser at which you can make all kinds of requests.
+Get, Post, Put, .....
+
+When you for example use "GET" and enter a url, it returns a JSON data that contains the result of the request.
+for example when you hit the url "https://dog.ceo/api/breeds/image/random", it will return the following URL:
+
+{
+    "message": "https://images.dog.ceo/breeds/elkhound-norwegion/r02091467_2960.jpg",
+    "status": "success"
+}
+
+
+-----------------------------------------------------------------------------------------------------------
+===========================================================================================================
+-----------------------------------------------------------------------------------------------------------
+
+Now, we'll install Express and create  simple server & do some basic routing ...
+
+npm init         ===> to initialize node modules
+npm i express    ===> to install express module.
+
+
+
+-----------------------------------------------------------------------------------------------------------
+===========================================================================================================
+-----------------------------------------------------------------------------------------------------------
+
+API     ===>    Application Programming Interface.
+for examples in node, we use some modules like 'fs'
+in fact we're using the modules APIs.
+APIs is what allow applications or differenct software to talk to each other.
+
+REST    ===>    Representational State Transfer 
+it's a way of building web APIs in a logical way, making them easy to comsume
+
+
+Now, we will learn how to build RESTful APIs ==> (APIs that follow the REST architecture)
+
+// There are couple of principles we need to follow:
+
+1- We need to Separate out API into logical resources. 
+2- These resources should then be exposed, which means to be made available using structured, resource-based URLs
+   to perform different actions on datal like reading, creating or deleting 
+3- The API should use the right HTTP methods and not the URL.
+4- Now, the data that we actually send back to the client or that we received from the client should usually use the JSON data format,
+   where some fomatting standards applied to it.
+5- They must be stateless.
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+For More details about REST: https://www.udemy.com/course/nodejs-express-mongodb-bootcamp/learn/lecture/15064846#notes
