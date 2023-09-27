@@ -4,6 +4,17 @@
 const fs = require('fs');
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`));
 
+exports.checkID = (req, res, next, val) => {
+    if(req.params.id * 1 > tours.length) {
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Invalid ID'
+        });
+    }
+    next();
+};
+// So, now I can remove it from every function that checks for id before responsing...
+// ✅✅✅
 
 
 // We'll use exports.function() before each function in order to export more than one function 
@@ -42,10 +53,7 @@ exports.createTour = (req, res) => {
 }
 
 exports.getTour = (req, res) => {    // the column here means that id is a variable. 
-    if(req.params.id > tours.length) {
-        return res.status(404).send('❌❌❌');     // that will exit this function and set the status code to 404.
-    }
-    
+
     const num = req.params.id * 1;
     
     const tour = tours.find(el => el.id === num);
@@ -57,13 +65,6 @@ exports.getTour = (req, res) => {    // the column here means that id is a varia
 }
 
 exports.deleteTour = (req, res) => {
-    if(req.params.id > tours.length) {
-        return res.status(404).json({
-            'status': 'NOT FOUND',
-            'message': 'Invalid ID...' 
-        });
-    }
-
     res.status(204).json({
         status: 'success',
         // Also, when we deleted, we don't send any data back,,, so the data is null.
@@ -72,14 +73,6 @@ exports.deleteTour = (req, res) => {
 };
 
 exports.updateTour = (req, res) => {
-    // We'll also check first for the id before processing any response...
-    if(req.params.id * 1 > tours.length) {
-        return res.status(404).json({
-            status: 'NOT FOUND 😔',
-            message: 'Invalid ID...'
-        });
-    }
-
     res.status(200).json({
         status: 'success',
         data: {

@@ -6,6 +6,8 @@ const tourController = require('./../controllers/tourController');
 // This object contains all the functions in the module "tourController";
 // To access any of these functions we'll use the object name before..
 
+router.param('id', tourController.checkID);     // another way for checking for the id
+                                                // using the advantage of "middleware"
 
 router
     .route('/')
