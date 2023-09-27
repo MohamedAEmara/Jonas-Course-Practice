@@ -147,5 +147,59 @@ app.get('/api/v1/tours/:id', (req, res) => {    // the column here means that id
     
     res.send(tour);
 
+
 }) 
 
+
+
+
+
+
+
+/////// Now, let's go to section (update) some tour details.....
+// is's done by "patch" method..
+
+
+// Pleaseeeeeeeeee, don't forget the / before the first route paramter. 
+app.patch('/api/v1/tours/:id', (req, res) => {
+    // We'll also check first for the id before processing any response...
+    if(req.params.id * 1 > tours.length) {
+        return res.status(404).json({
+            status: 'NOT FOUND 😔',
+            message: 'Invalid ID...'
+        });
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            tour: '<Updated Tour here NOT IMPLEMENTED YET...>'
+        }
+    })
+})
+
+
+
+
+
+
+
+
+// DELETING tours....
+app.delete('/api/v1/tours/:id', (req, res) => {
+    if(req.params.id > tours.length) {
+        return res.status(404).json({
+            'status': 'NOT FOUND',
+            'message': 'Invalid ID...' 
+        });
+    }
+
+
+
+    // note: 204 stands No-Content...
+    res.status(204).json({
+        status: 'success',
+        // Also, when we deleted, we don't send any data back,,, so the data is null.
+        data: null
+    })
+})
