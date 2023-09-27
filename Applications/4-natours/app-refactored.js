@@ -17,6 +17,9 @@ const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simpl
 // and ready to be sent back to the url '/api/v1/tours/'
 
 
+
+const users = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/users.json`));
+
 // To start a server we will use "app.listen()" to listen to a port
 
 // so, let's create a port variable
@@ -111,6 +114,57 @@ const updateTour = (req, res) => {
 };
 
 
+const getAllUsers = (req, res) => {
+    // NOT IMPLEMENTED YETTTTTTTT...
+    // just returns 500 ==> Internal Server Error..
+
+    res.status(500).json({
+        status: 'error',
+        message: 'This route is not implemented yet 😔'
+    });
+};
+
+const createUser = (req, res) => {
+    // NOT IMPLEMENTED YETTTTTTTT...
+    // just returns 500 ==> Internal Server Error..
+
+    res.status(500).json({
+        status: 'error',
+        message: 'This route is not implemented yet 😔'
+    });
+};
+
+
+const getUser = (req, res) => {
+    // NOT IMPLEMENTED YETTTTTTTT...
+    // just returns 500 ==> Internal Server Error..
+
+    res.status(500).json({
+        status: 'error',
+        message: 'This route is not implemented yet 😔'
+    });
+};
+
+const updateUser = (req, res) => {
+    // NOT IMPLEMENTED YETTTTTTTT...
+    // just returns 500 ==> Internal Server Error..
+
+    res.status(500).json({
+        status: 'error',
+        message: 'This route is not implemented yet 😔'
+    });
+};
+
+const deleteUser = (req, res) => {
+    // NOT IMPLEMENTED YETTTTTTTT...
+    // just returns 500 ==> Internal Server Error..
+
+    res.status(500).json({
+        status: 'error',
+        message: 'This route is not implemented yet 😔'
+    });
+};
+
 
 
 
@@ -137,3 +191,27 @@ const updateTour = (req, res) => {
 
 app.route('/api/v1/tours').get(getAllTours).post(createTour);
 app.route('/api/v1/tours/:id').get(getTour).patch(updateTour).delete(deleteTour);
+
+
+
+
+// -------------------------------------------------------------------------------------
+// =====================================================================================
+// -------------------------------------------------------------------------------------
+
+// Now, let's move forward with another "RESOURCE" which is (user)
+
+app
+    .route('/api/v1/users')
+    .get(getAllUsers)
+    .post(createUser);
+
+
+app
+    .route('/api/v1/users/:id')
+    .get(getUser)
+    .patch(updateUser)
+    .delete(deleteUser);
+
+
+// These functions are not implemented yet. So, I'll implement them after other functions..
