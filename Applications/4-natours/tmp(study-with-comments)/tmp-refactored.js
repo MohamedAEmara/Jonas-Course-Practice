@@ -1,5 +1,6 @@
 const fs = require('fs');
 const express = require('express');
+const { getuid } = require('process');
 const app = express();      // when calling the function express(), it adds a bunch of variables to app variable.
 
 
@@ -12,7 +13,7 @@ app.use(express.json());
 
 // We have to save the data into a variable, but first, we have to parse it to JSON..
 
-const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`));
+const tours = JSON.parse(fs.readFileSync(`../${__dirname}/dev-data/data/tours-simple.json`));
 // So this variable will be automatically converted to a JSON Object..
 // and ready to be sent back to the url '/api/v1/tours/'
 
@@ -215,3 +216,70 @@ app
 
 
 // These functions are not implemented yet. So, I'll implement them after other functions..
+
+
+
+// -------------------------------------------------------------------------------------
+// =====================================================================================
+// -------------------------------------------------------------------------------------
+
+// in app.route()       ==>     app is our router
+// but in order to organise our project.. we'll create a router for each resource..
+// As Follows:
+
+
+
+app.use('/api/v1/tours', tourRouter);   // so, we'll use this middleware "tourRouter"
+                                        // for this specific route    "/api/v1/tours"
+
+const tourRouter = express.Router(); 
+// this "tourRouter" here is actually a "middleware" 
+
+
+// So, For any route that uses tourRouter  ==>  the path will be relative to '/api/v1/tours/'
+
+tourRouter 
+    .route('/')         // Actually this '/' is relative to the tourRouter which is "/api/v1/tours"
+    .get(getAllTours)
+    .post(createTour);
+
+
+tourRouter
+    .route('/:id')      // And this is relative to the tourRouter which is '/api/v1/tours/:id'
+    .get(getUser)
+    .patch(updateTour)
+    .delete(deleteTour);
+
+
+
+
+
+
+
+// let's do the same thing with users   ==>     this called (mouting routers)
+
+const userRouter = express.Router();
+
+app.use('/api/v1/users', userRouter);
+
+
+userRouter
+    .route('/')
+    .get(getAllUsers)
+    .post(createUser);
+
+userRouter
+    .route('/:id')
+    .get(getUser)
+    .patch(updateUser)
+    .delete(deleteUser);
+
+
+
+
+// Now, we'll create separate folders
+
+// for examples routes
+
+
+// I'll keep this file as it.. as it contains many notes, and take some snippets from it to other modules...
