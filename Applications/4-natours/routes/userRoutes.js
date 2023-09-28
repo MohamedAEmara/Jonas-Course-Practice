@@ -21,6 +21,9 @@ router.param('id', (req, res, next, val) => {   // the new added parameter "val"
 // We can make a middle ware that checks ID once before every function and export it.
 
 
+
+
+
 router
     .route('/')
     .get(getAllUsers)

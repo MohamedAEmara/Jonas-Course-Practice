@@ -283,3 +283,15 @@ userRouter
 
 
 // I'll keep this file as it.. as it contains many notes, and take some snippets from it to other modules...
+
+
+
+// -------------------------------------------------------------------------------------
+// =====================================================================================
+// -------------------------------------------------------------------------------------
+
+
+
+
+// Now, we'll learn how to chain multiple middleware functions for the same route..
+// We may want to use it if we want to call a "middleware" function before calling the Controller..
