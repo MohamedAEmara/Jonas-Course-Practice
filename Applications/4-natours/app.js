@@ -1,3 +1,4 @@
+// here, we keep the application configuration in one standalone file...
 const express = require('express');
 const app = express();
 
@@ -20,6 +21,19 @@ app.use('/api/v1/users', userRouter);
 
 
 
-module.exports = app;
+// Note we cannot access files from the working directory in the URL follwing the url with
+// /dev-data/data/users.json    for example
+// This cannot be done in the browser..
+// This can be done just using (routes)
 
-// here, we keep the application configuration in one standalone file...
+// Another way is using "express.static()"
+// Files from your local directory are called "Static Files"
+// To access Static Files, we have to use built-in middleware "express.static()"
+// and in static() function we pass the directory where we want to server static files...
+app.use(express.static(`${__dirname}/public`));
+
+// Now we can access all files related to the root "public" using '/'
+// GREATTTTT..
+
+
+module.exports = app;
