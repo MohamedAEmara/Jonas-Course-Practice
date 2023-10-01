@@ -1,0 +1,130 @@
+// Definition from the "MongoDB" website.
+
+MongDB: is a document database with scalability and flexibility that you want.
+        with querying and indexing that you need.
+
+in MongDB, Tables are called ==> "Collection"
+           Rows are called   ==> "Domuments"
+
+
+Key Features in MongoDB:
+    1- Domument based: MongoDB stores data in documents (field-value pair data structure, NoSQL)
+    2- Scalable: Very easy to distribute data across multiple machines as your users and amounts of data grows.
+    3- Flexible: No document data schema required, so each document can have differnt number of type of fields.
+    4- Performant: Embedded data models, indexing, shading, flexible document, native applications, etc.
+
+
+                        Embedded VS Normalizing ...
+Embedded: is to include "comments" for example in the "blog" collection, this will be nested
+Normalizing: the data is always modeled in "relational database", and create new collection for the "comments" 
+
+
+// After installing MongDB on your local machine, create a folder "db" in "data" that contains our databases..
+
+// In order to open "Mongo Shell" just go to the application files in "Local Disk C" 
+// --> in "bin" folder, just open "mongod.exe"
+
+
+
+// In Mongo Shell, to use a database or create a new one and use it simple: 
+        $ use <database-name>
+
+
+// To show all databases in your connection: 
+        $ show dbs 
+
+// To show all collections in your current database:
+        $ show collections
+
+
+// To insert a document into your collection, 
+        $ db.<collection-name>.insertOne(<json-object>);
+
+
+// To insert mansy documents into your collection, 
+        $ db.<collection-name>.insertMany(<arry-of-objects>);
+
+
+// To print out all documents you have in some collection: 
+        $ db.<collection-name>.find()
+
+
+
+================================================= Search (Querying) ===================================================
+
+// To search for tours with some name:    ===>  we'll use db.<collection-name>.find() "but with some filter object"
+// for example: 
+        $ db.tours.find({ name: "The Forest Hiker" })
+// We can use it with any key with its value..
+
+// Another example: "Find tours with price (less than or equal) 500$
+        $ db.tour.find({ price: {$lte: 500}})           
+## whenever you see $ in mongodb command ==> it means it's a "Mongo Operator" ##
+
+
+// To search for more than one Criteria: 
+// For example: "search for tours with price less than 500$ and rating greater than or equal 4.8"
+        $ db.tours.find({ price: {$lt: 500}, rating: {$gte: 4.8}})
+
+
+// Now, Oring querying:  (using $or: Operator and then pass an array to check if any of them is true)
+// For example: "search for tours with either price less than 500$ OR rating greater than or equal 4.8"
+        $ db.tours.find({ $or: [ {price: {$lt: 500}}, {rating: {$gte: 4.8}}]})
+
+
+// All the previous operations show the whole document with all their fields..
+// To specify some of them to be printed, we can pass another {} with the field we're interested in with value: 1
+
+        $ db.tours.find({ $or: [ {price: {$lt: 500}}, {rating: {$gte: 4.8}}]}, {name: 1, _id: 0})
+## This will print only the name filed and the "ID" as the default for id is to be printed... unless we specify it's value to 0
+
+
+// To execlude some of them we use the same approach but with value = 0
+        $ db.tours.find({ $or: [ {price: {$lt: 500}}, {rating: {$gte: 4.8}}]}, {_id: 0})
+
+
+
+
+================================================= Update ===================================================
+
+// Now, let's study "How to UPDATE documents"
+        $ db.<collection-to-update>.updateOne(<arguments-to-update>)
+## first, we specify a filter object to specify objects you're interested in, then the new value you want ##
+== in the second parameter, we use {$set} operator and in it we can specify the (property) to update and the (value) to specify..
+
+for example:    ===>    update the price of "The Forest Hiker" to 333$
+        $ db.tours.updateOne( {name: "The Forest Hiker"}, {$set:{price: 333}})
+// The result of this query is : 
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,              // 0 if we didn't find any document with the same "filter"
+  modifiedCount: 0,             // 1 if the old value is not the same as the setted value.. 
+  upsertedCount: 0
+}
+
+When we use "updateOne" and there are more than one match, just the first match will be updated.
+
+// We also can add a new property for all current documents, using {} "empty filter" to select all and add a new property with its value
+        $ db.tours.updateMany({}, {$set:{test: 'nothing'}})
+
+        
+
+
+================================================= Delete ===================================================
+
+Simply, to delete one document, 
+        $ db.tours.deleteOne({name: 'some name'})
+## The first match of "some name" will be deleted
+
+And to delete all records that match
+        $ db.tours.deleteMany({name: 'some name'})
+## All documents with the name = "some name" will be deleted.
+
+To delete all the documents in the collection, just keep the filter object {} empty, as follows:
+        $ db.tours.deleteMany({})
+xxxxxxxxxxxxx You have to be careful when using it specify with real apps as you CANNOT  come back to these records afterwise xxxxxxxxxxxxx
+
+
+
+
