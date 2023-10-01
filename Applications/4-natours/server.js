@@ -4,8 +4,20 @@
 
 // server.js   is where every thing starts..
 
-
 const app = require('./app');
+
+// To get the environment variables we're on now..
+console.log(app.get('env'));        // development..
+// Environment Variables: are global variables that are used to define the environment
+// in which a node app is running ...
+// This value is set by "Express"
+
+
+// There are a punch of variables that are located in "process.env"
+
+
+console.log(process.env);
+
 
 const port = 3000;
 app.listen(port, () => {
