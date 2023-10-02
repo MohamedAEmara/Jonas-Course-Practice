@@ -5,6 +5,26 @@
 // server.js   is where every thing starts..
 
 const app = require('./app');
+const dotenv = require('dotenv');
+dotenv.config({path: './config.env'});
+
+// Import mongoose module to be able to interact with remote databases.
+const mongoose = require('mongoose');
+
+
+// To start a connection with some mongo database we use "mongoose.connect(<CONNECTION_STRING>)"
+let stringConnection = process.env.DATABASE;
+const DB = stringConnection.replace("<PASSWORD>", process.env.DATABASE_PASSWORD);
+// console.log(stringConnection);
+mongoose
+  .connect(DB, {
+    // useNewUrlParser: true,
+    // useCreateIndex: true,
+    // useFindAndModify: false
+  })
+  .then(() => console.log('DB connection successful!'));
+// console.log(process.env.DATABASE);
+// console.log(process.env);
 
 // To get the environment variables we're on now..
 console.log(app.get('env'));        // development..
@@ -16,10 +36,9 @@ console.log(app.get('env'));        // development..
 // There are a punch of variables that are located in "process.env"
 
 
-console.log(process.env);
 
 
-const port = 3000;
+const port = 2000;
 app.listen(port, () => {
     console.log(`App running on port ${port} ...`);
 })

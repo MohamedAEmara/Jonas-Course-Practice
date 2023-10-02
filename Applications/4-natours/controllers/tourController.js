@@ -32,12 +32,12 @@ exports.getAllTours = (req, res) => {
 
 exports.checkBody = (res, req, next) => {
     // Check if the body contains the "name" property and "price" property ??
-    if(!req.body.name || !req.body.price) {
-        return res.status(404).json({
-            'status': 'Invalid Request',
-            'data': req.body.id
-        });
-    } 
+    // if(!req.body.name || !req.body.price) {
+    //     return res.status(404).json({
+    //         'status': 'Invalid Request',
+    //         'data': req.body.id
+    //     });
+    // } 
     next();
 }
 
@@ -48,7 +48,9 @@ exports.createTour = (req, res) => {
     console.log("❌❌❌❌");
     console.log(req.body);
     const newTour = Object.assign({id: newId}, req.body);
+    console.log('new tour')
     console.log(newTour);
+    console.log('new tour')
 ``
     console.log(tours.length);
     tours.push(newTour);
