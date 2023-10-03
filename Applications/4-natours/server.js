@@ -4,8 +4,10 @@
 
 // server.js   is where every thing starts..
 
-const app = require('./app');
+// in order to have access of "environment-variables"
+// in our app, we import it first...
 const dotenv = require('dotenv');
+const app = require('./app');
 dotenv.config({path: './config.env'});
 
 // Import mongoose module to be able to interact with remote databases.

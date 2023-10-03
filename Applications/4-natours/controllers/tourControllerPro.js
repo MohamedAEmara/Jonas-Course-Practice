@@ -83,14 +83,46 @@ exports.createTour =  (req, res) => {
 
 }
 
+// ================================ Querying ======================================== //
 
-  
-exports.getAllTours = async (req, res) => {
+// Now, we'll learn how to filter our database with some {key: value} pair filter...
+// to filter in URL, we pass {key:value} pair after ? in our route..
+// For example:
+
+//    localhost:2000/api/v1/tours?duration=5&difficulty=easy
+
+// Actually "Postman" recognises the parameters and puth the value with its key as a parameters.
+
+
+// Now, we'll know how to handle these filters in Express..
+
+// These data can be accessed by "req.query"
+// ===================================================================================
+
+exports.getAllToursSTUDY = async (req, res) => {
   try {
-    const allTours = await Tour.find().then((tmp) => {
-      res.json(tmp);
+    console.log('hereeeeeeeeeeee' + req.query);     // the query passed in the URL
+    const allTours = await Tour.find(req.query).then((tmp) => {
+      
+      res.json({
+        "number of tours": tmp.length,
+        data: tmp
+      });
+    
       console.log('🙋‍♂️🙋‍♂️🙋‍♂️');
     })
+    
+    // another way to apply filter using "MONGOOSE": 
+    const tours = await Tour.find()
+      .where('duration')
+      .equals(5)
+      .where('difficulty')
+      .equals('easy');
+    
+    // We can also use "lte" or "gte" not only "equals"
+    // We also can sort, show the first number of results and many other stuff
+    // console.log(tours);  
+  
   } catch(err) {
     res.status(500).json({
       status: 'fail',
@@ -101,6 +133,49 @@ exports.getAllTours = async (req, res) => {
     });
   }
 }
+
+
+
+
+exports.getAllTours = async (req, res) => {
+  try { 
+    const queryObj = req.query;   // it's const as if change its value, we actually change 
+                                  // the value of the query in req object.
+    
+    // But to create a new Object not just a reference to the original one is as follows:
+    const newQueryObj = {...req.query};
+
+    // Now, we want to execlude some of queries like "page", that are not related to our database filters.
+    // We'll create an arry to include execluded fields from our query..
+
+    const execludedFields = ['page', 'sort', 'limit', 'fields']; 
+    // Because these are about limitation of results that we'll learn soon..
+
+    // Now, we want to remove all these fields from our new query object
+    execludedFields.forEach(el => delete newQueryObj[el]);   // at every element from the execluded 
+                                                             // fileds, we will remove it from our newQueryObject
+    
+
+    const tours = await Tour.find(newQueryObj);
+
+    res.status(200).json({
+      status: 'success',
+      cnt: tours.length,
+      data: tours
+    })
+  
+  } catch (err) {                                        
+    console.log('ERRRRRROR....');
+    res.status(500).json({
+      status: 'fail',
+      message: 'Internal Server Error'
+    });
+  }
+  
+}
+
+
+
 
 
 exports.getTour = async (req, res) => {
