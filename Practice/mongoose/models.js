@@ -75,8 +75,9 @@ const Tour = mongoose.model('Tour', tourSchema);
 
 const testTour = new Tour({
     // Here we pass the object data...
-    name: 'Adventour',
-    price: 20
+    name: 'Emaaaaaaaaaraaaaaaaaaaa',
+    price: 20000,
+    blabla: 'ksjdlfkjsdlf'
 });
 
 
