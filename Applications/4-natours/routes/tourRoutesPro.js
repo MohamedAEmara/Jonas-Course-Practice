@@ -5,7 +5,16 @@ const tourControllerPro = require('./../controllers/tourControllerPro');
 
 router
     .route('/')
-    .post(tourControllerPro.createTour);              
+    .post(tourControllerPro.createTour)    
+    .get(tourControllerPro.getAllTours)
+    
+    
+
+router
+    .route('/:id')
+    .get(tourControllerPro.getTour)
+    .patch(tourControllerPro.updateTour)
+    .delete(tourControllerPro.deleteTour);
     
 // router 
 //     .route('/:id')

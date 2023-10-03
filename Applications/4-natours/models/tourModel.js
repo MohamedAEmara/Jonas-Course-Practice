@@ -22,3 +22,4 @@ const Tour = mongoose.model('Tour', tourSchema);
 module.exports = Tour;
 // Here, we export the Tour model
 // Actually, we will use them in "tourController" in order to create, delete, update, ...
+

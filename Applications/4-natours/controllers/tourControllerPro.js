@@ -83,3 +83,95 @@ exports.createTour =  (req, res) => {
 
 }
 
+
+  
+exports.getAllTours = async (req, res) => {
+  try {
+    const allTours = await Tour.find().then((tmp) => {
+      res.json(tmp);
+      console.log('🙋‍♂️🙋‍♂️🙋‍♂️');
+    })
+  } catch(err) {
+    res.status(500).json({
+      status: 'fail',
+      message: {
+        error: 'Internal Server Error',
+        data: err
+      }
+    });
+  }
+}
+
+
+exports.getTour = async (req, res) => {
+  try {
+    const tour = await Tour.findById(req.params.id)      // "req.params.id" to find the id passed in the URL.
+    // This is a built-in function that's equivalent to:
+    // Tour.findOne({_id: req.params.id});
+     
+      .then((promise) => {
+        res.status(200).json({
+          status: 'success',
+          tour: promise
+        });
+      });
+  } catch(err) {
+    console.log('Error ❌❌');
+    res.status(500).json({
+      status: 'fail',
+      message: err
+    });
+  }
+}
+
+
+exports.updateTour = async (req, res) => {
+  try {
+    // First, query for the tour to be updated..
+    // And then update it..
+    
+    // We actually can do it in one function with mongoose...
+    // findByIdAndUpdate()
+    // It takes two parameters, the first on is the id of the document
+    // And the second on is the body of the document..
+    
+    // It can take more than two parameters..
+    // for example , {new: true}  ==> to return the updated document..
+    // runValidator: true ==> to rerun the validator when we update document and check it.. 
+    let tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+    });
+
+    // Now, let's send the newly updated document to the client..
+    res.json({
+      status: 'success',
+      tour: tour
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'fail',
+      message: 'Internal Server Error'
+    });
+  }
+}
+
+
+
+exports.deleteTour = async(req, res) => {
+  try {
+    const tour = await Tour.findByIdAndDelete(req.params.id).then(() => {
+      console.log(tour);
+      console.log('Deleted');
+      res.status(200).json({
+        status: 'success',
+        message: 'Document Deleted Successfully'
+      });
+    })
+  } catch (err) {
+    res.status(500).json({
+      status: 'fail',
+      message: 'Cannot Delete This Document'
+    });
+  }
+}
