@@ -4,7 +4,7 @@ const fs = require('fs');                   // we need to access file system mod
 const dotenv = require('dotenv');           // we need dotevn to be able to connect to database.
 dotenv.config({path: './config.env'});  
 
-const Tour = require('../../models/tourModel');     // We need to access Tour model 
+const Tour = require('./tourModel');     // We need to access Tour model 
 const mongoose = require('mongoose');   
 
 let stringConnection = process.env.DATABASE;
@@ -12,9 +12,9 @@ const DB = stringConnection.replace("<PASSWORD>", process.env.DATABASE_PASSWORD)
 
 mongoose
   .connect(DB, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false
+    // useNewUrlParser: true,
+    // useCreateIndex: true,
+    // useFindAndModify: false
   })
   .then(() => console.log('DB connection successful!'));
 
