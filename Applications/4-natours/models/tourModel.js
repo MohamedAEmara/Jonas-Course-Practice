@@ -53,7 +53,9 @@ const tourSchema = new mongoose.Schema({
     images: [String],           // if there is on image or more, so we use an array of strings
     createdAt: {
         type: Date,             // Date is a standard JS data type
-        default: Date.now()
+        default: Date.now(),
+        // NOTE:::::::::::: we can hide some properties by default in the result for users..
+        select: false      // by specifying select: false.
     },
     startDates: [Date]          // Dates the tour starts, for example there is a tour next December, and anther one in February
     

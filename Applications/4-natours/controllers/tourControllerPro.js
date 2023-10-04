@@ -31,6 +31,18 @@ const Tour = require('../models/tourModel');
 
 
 
+// ================================ TOP 5 BEST TOURS ===================================== //
+
+
+exports.aliasTopTours = (req, res, next) => {
+  req.query.limit = '5';        // note: everything in query is a "string"
+  req.query.sort = '-ratingsAverage,price';
+  req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  // Now, we're ready to send our reqest to the next function which is "getAllTours". 
+  next(); 
+}
+
+
 exports.createTour =  (req, res) => {
 
     console.log('from tourControllerPro ✅✅');
@@ -190,7 +202,7 @@ exports.getAllTours = async (req, res) => {
     // We first specify all the (words) to replace ..
     // Then, a callback function that applies the change on these (words)
 
-    const modifiedQuery = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+    let modifiedQuery = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
 
     // console.log(modifiedQuery);
     // console.log(queryStr);
@@ -199,7 +211,66 @@ exports.getAllTours = async (req, res) => {
     // Now, we can use the modifiedQuery as a query filter in find() method
     // But first, we have to parse it to JSON ...
 
-    const tours = await Tour.find(JSON.parse(modifiedQuery));
+    let query = Tour.find(JSON.parse(modifiedQuery));
+
+    
+    // Sorting ...
+    if(req.query.sort) {
+      // console.log(req.query.sort);  
+      // console.log(modifiedQuery.sort(req.query.sort));
+      // query = query.sort(req.query.sort);
+
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    }
+
+
+    // localhost:2000/api/v1/tours?fields=createdAt,price
+
+    if(req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);     // This is how we include fileds
+    } else {          // But if the user didn't specify any field, there are many that aren't important to user
+                      // like "__v" this is not imporatnt at all for users.
+                      // To execlude fields, we use the same approach but use (-) minus before attribute
+      query = query.select('-__v');
+    }
+
+
+
+    // Pagination... 
+    const page = req.query.page * 1 || 1;     // if the page query is present
+                                              // Convert it to Number
+                                              // Otherwise set the default value = 1
+
+    const limit = req.query.limit * 1 || 100;
+    const skip = limit * (page-1);
+
+
+    // We finally need to handle if the page is more than number of pages..
+    if(req.query.page) {
+      const numTours = await Tour.countDocuments();
+      if(skip > numTours) {
+        // console.log('this page does not exist');
+        throw new Error('This page does not exist');
+        // If throwing the error happends, it will immediately go to the catch block
+        // so the query won't finish and nothing will be displayed to the user..
+      }    
+    }
+    // We have a built-in function that accepts a (skip) ===> pages to skip
+    // and (limit) ===> pages to display
+
+    query = query.skip(skip).limit(limit);
+
+
+    // AFter applying all operations we want on the query ... we finally awaits the result
+    // and store it into a variable...
+
+    const tours = await query;
+
+    console.log(req.query.sort);
+
+
 
     res.status(200).json({
       status: 'success',
