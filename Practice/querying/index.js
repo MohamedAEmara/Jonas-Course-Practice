@@ -99,3 +99,88 @@ console.log(modifiedQuery);
 // Now, we can use the query but as a JSON object not a string like this:
 
 const query = Tour.find(JSON.parse(modifiedQuery));
+
+
+
+
+
+
+// ============================================== Sorting Results ========================================
+
+// We will first search for any parameter "sort"
+// if it exists, so apply sort to the results based on the value of "sort"
+
+// let query = Tour.find(JSON.parse(modifiedQuery));
+
+if(req.query.sort) {
+  query = query.sort(req.query.sort);
+}
+
+// We specify the query ==> apply sorting on it ==> finally we wait for that query..
+const tourss = await query;
+
+// NOTE: don't forget to make a (query) as a variable not a const to be able to change it..
+
+
+
+
+// What if there are more than one document with the same price
+// We want to sort them by the rating next..
+
+// Simply in mongoose, it's done as follows:
+query = query.sort('price ratingAverage');    // this will sort firstly by price
+                                              // when there are more than one document with the same price
+                                              // they will be sorted based on their ratingAverage
+
+
+// Note: in the URL the sorting parameters will be separated by commas.
+// We want to split the string at each comma, then join the array elements together by spaces..
+const sortBy = req.query.sort.split(',').join(' ');
+
+query = query.sort(sortBy);
+
+
+// Note: the default of sorting is "Ascending" ... To make it "Descending" just write (-) before the parameter
+// For example:
+
+'localhost:2000/api/v1/tours?sort=price,-ratingAverage'
+
+// here we first sort by price ascendingly ,, after that if there are more than one document with
+// the same price, we sort them descendingly..
+
+
+
+
+// =================================== Filter Attributes ===================================
+
+// Now, if we want to show only some attributes for the tours not all of them
+// For example: we want to show name, duration, price, and difficulty
+
+// The URL will be something like: 
+'localhost:2000/api/v1/tours?fields=name,duration,difficulty,price'
+
+// The implementation will be similar to what we did for "sorting"...
+query = query.select('name duration difficulty price');
+
+
+if(req.query.fields) {
+  const fields = req.query.fields.split(',').join(' ');
+  query = query.select(fields);     // This is how we include fileds
+} else {          // But if the user didn't specify any field, there are many that aren't important to user
+                  // like "__v" this is not imporatnt at all for users.
+                  // To execlude fields, we use the same approach but use (-) minus before attribute
+  query = query.select('-__v');
+}
+
+
+
+// In the Schema, we can specify a property to hide some properties from the user
+// Like this:    select: false
+
+/*
+createdAt: {
+  type: Date,
+  default: Date.now(),
+  select: false
+}
+*/
