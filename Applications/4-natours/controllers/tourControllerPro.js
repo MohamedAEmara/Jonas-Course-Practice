@@ -143,7 +143,7 @@ exports.getAllTours = async (req, res) => {
                                   // the value of the query in req object.
     
     // But to create a new Object not just a reference to the original one is as follows:
-    const newQueryObj = {...req.query};
+    let newQueryObj = {...req.query};
 
     // Now, we want to execlude some of queries like "page", that are not related to our database filters.
     // We'll create an arry to include execluded fields from our query..
@@ -156,19 +156,63 @@ exports.getAllTours = async (req, res) => {
                                                              // fileds, we will remove it from our newQueryObject
     
 
-    const tours = await Tour.find(newQueryObj);
+
+
+    // ========================================== Advanced Filtering =================================
+
+    // Now, we'll study how to do more complex querying .. like "greater than or equal"
+
+    // to use it in our code, it's something like this:
+
+    // const filterObject = { difficulty: 'easy', duration: {$gte: 5} };
+
+    // Note that to use any of {gte, gt, lt, lte} we have to put it in a new object {}
+
+
+    // But in the URL it's like this:
+    // '127.0.0.1:3000/api/v1/tours?duration[gte]=5&difficulty=easy'
+    // When we print out the (req.query) for this URL request, we'll get:
+    // `{ difficulty: 'easy', duration: { gte: 5} }`
+
+
+    // Note the only difference between "MongoDB query" and "req.query"
+    // is that in "req.query" there's no $ before the operators like (gte)
+    // We have to implement that to be able to use the filter comming from the URL
+    // into our mongoose code..
+
+    // We will replace "gte" with "$gte" ... After stringifying the object.
+
+    const queryStr = JSON.stringify(newQueryObj);
+
+    // We now want to match any of the {gt, gte, lt, lte}, but we want the exact words, not as a substring of another word...
+    // So, we'll specify \b before and after the regular expression..
+    // Another flag is (g) as we want to replace all occurences not only the first one
+    // We first specify all the (words) to replace ..
+    // Then, a callback function that applies the change on these (words)
+
+    const modifiedQuery = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+
+    // console.log(modifiedQuery);
+    // console.log(queryStr);
+
+
+    // Now, we can use the modifiedQuery as a query filter in find() method
+    // But first, we have to parse it to JSON ...
+
+    const tours = await Tour.find(JSON.parse(modifiedQuery));
 
     res.status(200).json({
       status: 'success',
-      cnt: tours.length,
-      data: tours
+      cntTours: tours.length,
+      tours: tours
     })
   
   } catch (err) {                                        
     console.log('ERRRRRROR....');
     res.status(500).json({
       status: 'fail',
-      message: 'Internal Server Error'
+      message: 'Internal Server Error',
+      details: err
     });
   }
   
