@@ -20,8 +20,13 @@ router
     .get(tourControllerPro.getMonthlyPlan);
 
 
+router
+    .route('/:id')
+    .get(tourControllerPro.getTour)
+    .patch(tourControllerPro.updateTour)
+    .delete(tourControllerPro.deleteTour);
 
-    
+
 router
     .route('/top-5-tours')
     .get(tourControllerPro.aliasTopTours, tourControllerPro.getAllTours);
@@ -34,11 +39,6 @@ router
     
     
 
-router
-    .route('/:id')
-    .get(tourControllerPro.getTour)
-    .patch(tourControllerPro.updateTour)
-    .delete(tourControllerPro.deleteTour);
 
 
 

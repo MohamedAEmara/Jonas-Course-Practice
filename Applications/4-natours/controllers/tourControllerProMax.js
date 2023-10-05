@@ -279,31 +279,20 @@ exports.getTour = async (req, res) => {
 
 exports.updateTour = async (req, res) => {
   try {
-    // First, query for the tour to be updated..
-    // And then update it..
-    
-    // We actually can do it in one function with mongoose...
-    // findByIdAndUpdate()
-    // It takes two parameters, the first on is the id of the document
-    // And the second on is the body of the document..
-    
-    // It can take more than two parameters..
-    // for example , {new: true}  ==> to return the updated document..
-    // runValidator: true ==> to rerun the validator when we update document and check it.. 
-    let tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true
-    });
+        let tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {  
+            new: true,
+            runValidators: true
+        });
 
-    // Now, let's send the newly updated document to the client..
-    res.json({
-      status: 'success',
-      tour: tour
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: 'fail',
-      message: 'Internal Server Error'
+        // Now, let's send the newly updated document to the client..
+        res.json({
+        status: 'success',
+        tour: tour
+        });
+    } catch (err) {
+        res.status(500).json({
+        status: 'fail',
+        message: 'Internal Server Error'
     });
   }
 }
