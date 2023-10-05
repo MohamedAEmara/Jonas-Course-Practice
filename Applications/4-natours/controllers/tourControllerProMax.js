@@ -122,6 +122,137 @@ exports.getAllTours = async (req, res) => {
 
 
 
+exports.getMonthlyPlan = async (req, res) => {
+    try {
+        const year = req.params.year * 1;
+        
+        const plan = await Tour.aggregate([
+            {
+                $unwind: '$startDates'              // This "$unwind" separates all array elements into a single documents
+            },   // for example if we have 3 start dates for "Alex" trip ,,, there will be 3 trips all with one of the start dates.
+            
+            {   // Now, in $match we'll select all start dates that are in the year (year)
+                $match: 
+                    { startDates:      
+                        {       // Mongo is good at comparing dates..
+                            $gte: new Date(`${year}-01-01`),
+                            $lte: new Date(`${year}-12-31`) 
+                        } 
+                    }
+            },
+            {
+                $group: {
+                    // _id is to specify what we will use to group documents..
+                    _id: {
+                        $month: '$startDates',       // this will group by similar monthes in startDates
+                    },
+                    countTours: {
+                        $sum: 1                 // How many tours on this month
+                    },
+                    tours:                     // Which tours are on this month ??
+                    // We want to push them into an array to display them all in this month..
+                    // We can do it using ($push) in mongo..
+                    {
+                        $push: '$name'
+                    }
+                    
+                }
+            }, 
+            {
+                $addFields: { month: '$_id' }       // add a field named "month" with value (_id)
+            },
+            {
+                $sort: {
+                    month: 1
+                }
+            },
+            {
+                $project: {
+                    _id: 0                      // hide _id from the output..
+                }
+            }
+        
+        
+        ]);
+
+
+        res.status(200).json({
+            status: 'success',
+            cnt: plan.length,
+            data: plan
+        })
+
+    } catch (err) {
+        res.status(404).json({
+            status: 'fail',
+            message: err
+        })
+    }
+}
+
+exports.getTourStats = async (req, res) => {          // stats is a short for "Statistics"
+    // Here we can get the min, max, average, ....
+    // using MongoDB aggregate function
+    try {
+        const stats = await Tour.aggregate([
+            {
+                $match: { ratingAverage: { $gte: 4.5 } }
+            },
+            {   // group as the name tells, is to group some document with the same feature value together..
+                // for example: Group all "easy" trips together... after that we're able to apply things like: "average", "min", "max", ... 
+                $group: {
+                    _id: { $toUpper: '$difficulty'},           // We will group all (difficult) together and the same thing for (easy) and (midium)
+                    // _id: '$difficulty',      
+
+                    // Note, we use _id to (group by) the filterred fields...
+                    // we for example can group by difficulty   ===>    _id: { $difficulty }
+                    // or can also group by ratingAverage       ===>    _id: { $ratingAverage }
+                    
+                    // We can also show the difficulties in UPPERCASE: {'DIFFICULT', 'EASY', 'MIDIUM'}
+                    // By using another operator: ($toUpper)
+                    // _id: { $toUpper: '$difficulty'}
+
+                    numTours: { $sum: 1},           // just add (1) at each document to get the total number of documents in this group.
+                    numRatings: { $sum: '$ratingQuantity'},
+                    avgRating: { $avg: '$ratingAverage' },
+                    avgPrice: { $avg: '$price' },
+                    minPrice: { $min: '$price' },
+                    maxPrice: { $max: '$price' }
+                }
+            },
+            // Another Object in our array is "sort" to sort the result documents..
+            {
+                $sort: {
+                    // Here, we specify which field we want to sort by..
+                    // We here have access to all fields defined up here in "$group"
+                    avgPrice: 1             // 1 for ascending..            
+                }
+            }
+        /*    {
+                // We also can repeat STAGES..  
+                // we will use another $match with _id in it..
+                // But _id here refers to "difficulty" we specified up in "$group"..
+                $match: { _id: { $ne: 'EASY'} }             // "$ne" ==> "not equal"..
+                // So, we'll show all groups excluding "EASY"...
+            }   */
+        ]);
+
+
+        res.status(200).json({
+            status: 'success',
+            data: {
+                stats: stats
+            }
+        });
+    } catch (err) {
+        console.log('Error ❌'); 
+        res.status(404).json({
+            status: 'fail',
+            message: err
+        });
+    }
+}
+
 
 
 exports.getTour = async (req, res) => {

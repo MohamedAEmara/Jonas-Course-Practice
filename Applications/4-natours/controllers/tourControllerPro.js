@@ -454,26 +454,3 @@ exports.deleteTour = async(req, res) => {
 
 
 
-
-
-///////////////////////////////////////// EXECUTE QUERY /////////////////////////////////////////////
-const features = new APIFeatures(Tour.find(), req.query)     
-// we pass query as (all documents) 
-// and queryString as (the query in the path)
-  .filter()
-  .sort()
-  .limitFields()
-  .paginate();
-// then, we applied all the fucntions in "APIFeatures class"
-
-// After that we have the qeury ready to display...
-const tours = await features.query;
-
-
-res.status(200).json({
-  status: 'success',
-  results: tours.length,
-  tours: tours
-});
-
-

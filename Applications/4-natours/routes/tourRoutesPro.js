@@ -7,7 +7,21 @@ const tourControllerPro = require('./../controllers/tourControllerProMax');     
 
 
 
+router
+    .route('/tour-stats')
+    .get(tourControllerPro.getTourStats);
+                                                                                
 
+
+
+
+router
+    .route('/monthly-plan/:year')
+    .get(tourControllerPro.getMonthlyPlan);
+
+
+
+    
 router
     .route('/top-5-tours')
     .get(tourControllerPro.aliasTopTours, tourControllerPro.getAllTours);
@@ -25,6 +39,9 @@ router
     .get(tourControllerPro.getTour)
     .patch(tourControllerPro.updateTour)
     .delete(tourControllerPro.deleteTour);
+
+
+
     
 // router 
 //     .route('/:id')
