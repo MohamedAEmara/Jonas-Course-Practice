@@ -1,7 +1,12 @@
 const express = require('express');
 const router = express.Router();
 
-const tourControllerPro = require('./../controllers/tourControllerPro');  
+const tourControllerPro = require('./../controllers/tourControllerProMax');     // I changed the path to "tourControllerProMax" 
+                                                                                // now, "tourControllerPro" is for study only.
+
+
+
+
 
 router
     .route('/top-5-tours')
