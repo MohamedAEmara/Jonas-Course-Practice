@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-
 const slugify = require('slugify');
+const validator = require('validator');
 
 
 const tourSchema = new mongoose.Schema({
@@ -9,7 +9,23 @@ const tourSchema = new mongoose.Schema({
         required: [true, 'A tour must have a name'],
         unique: true,
         maxlength: [40, 'A tour name must have less than or equal 40 characters'],
-        minlength: [10, 'A tour name must have less than or equal 10 characters']
+        minlength: [10, 'A tour name must have less than or equal 10 characters'],
+
+        // The follwing validator is only to demonstrate how we use npm validators...
+
+
+        /*
+        validate:  
+            [validator.isAlpha, 'Tour name must only be English letter']           // We won't call it here, we just specify that this is the function that'll be used.
+            
+        */
+        
+        // validate: {
+        //     validator: function(var) {
+        //         return validator.isAlpha(var);
+        //     },
+        //     message: 'Tour name must be only English Letters..'
+        // }
     },
     slug: String,
     duration: {
@@ -38,7 +54,7 @@ const tourSchema = new mongoose.Schema({
         type: Number,
         default: 4.5,
         max: [5, 'Rating cannot be greater than 5'],
-        min: [1, 'Rating cannot be less than 5']
+        min: [1, 'Rating cannot be less than 1']
 
     },
     ratingQuantity: {
@@ -50,13 +66,31 @@ const tourSchema = new mongoose.Schema({
         // if we create a document with no rating, the rating will be set to "4.5"
         default: 4.5,
         max: [5, 'Rating cannot be greater than 5'],
-        min: [5, 'Rating cannot be less than 5']
+        min: [1, 'Rating cannot be less than 1']
     }, 
     price: {
         type: Number,
         required: [true, 'A tour must have a price']
     },
-    priceDiscount: Number,
+    priceDiscount: {
+        // Now, we'll implement a custom validator that checks if the discount is less than or equal price
+        // We can do it using "validate" property and a callback function ... "NOT ARROW FUNCTION..."
+        type: Number,
+        validate: {
+            validator: function(val) {
+                // console.log(val + '  val');
+                // console.log(this.price + '  price');
+
+                // Note: "this" is only accessable when we're creating a new document..
+                return val < this.price;
+
+                // But it's not gonna work when we're using (patch request)..
+                
+                // There are many npms that do some useful validations for us..
+            },      // NOTE: ({VALUE}) refers to the input to the function,, but it's only in mongoose..
+            message: 'Discount price ({VALUE}) CANNOT be larger than Price !!!'
+        } 
+    },
     summary: {
         type: String,
         trim: true,          // trim works only with "Strings", Note that every typy have their own (schema types)
