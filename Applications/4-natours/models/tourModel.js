@@ -1,13 +1,15 @@
 const mongoose = require('mongoose');
 
-const slugfiy = require('slugify');
+const slugify = require('slugify');
 
 
 const tourSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, 'A tour must have a name'],
-        unique: true
+        unique: true,
+        maxlength: [40, 'A tour name must have less than or equal 40 characters'],
+        minlength: [10, 'A tour name must have less than or equal 10 characters']
     },
     slug: String,
     duration: {
@@ -183,6 +185,21 @@ tourSchema.pre('find', function(next) {
 tourSchema.pre(/^find/, function(next) {        // Any string that starts with "find" will be included..
     this.find({secretTour: {$ne: true}});
 
+    next();
+})
+
+
+tourSchema.pre('aggregate', function(next) {
+    // "This" here refers to (the current aggregation object) 
+    // console.log('hi' + this.pipeLine());
+    // console.log("hello" + this);
+    console.log(this.pipeline());       // An array contains "$match", "$group", "$sort" objects ...
+
+    // We want to add another $match at the beginning of the array
+    // we'll use the js method (unshift)
+    this.pipeline().unshift({'$match': {secretTour: {$ne: true}} });
+
+    console.log(this.pipeline());       // another match() object added the aggregation pipeline..
     next();
 })
 

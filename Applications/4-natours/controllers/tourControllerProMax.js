@@ -18,8 +18,7 @@ exports.aliasTopTours = (req, res, next) => {
   next(); 
 }
 
-
-exports.createTour =  (req, res) => {
+exports.createTour =  async (req, res) => {
 
     console.log('from tourControllerPro ✅✅');
     // We can create a new tour this way..
@@ -40,18 +39,18 @@ exports.createTour =  (req, res) => {
 
         // const newTour = new Tour({})
         // newTour.save()
-        console.log('==========================================================');
+        // console.log('==========================================================');
         // console.log(req);
-        console.log('==========================================================');
+        // console.log('==========================================================');
         // console.log(req.name);
         // console.log(req.body.name);
         // console.log(req.body);
-        console.log('==========================================================');
+        // console.log('==========================================================');
         // const newTour = await Tour.create(req.body);
         // const newTour = Object.assign({}, JSON.parse(req.body));
-        console.log('aaa ' + req.body);
+        // console.log('aaa ' + req.body);
         // console.log('bbb ' + res.body);
-        const newTour = new Tour(req.body);
+        const newTour = await Tour(req.body);
         console.log(newTour);
 
         newTour.save().then(() => {
@@ -70,6 +69,27 @@ exports.createTour =  (req, res) => {
 
 
 }
+
+// exports.createTour = async (req, res) => {
+//     try {
+//         console.log(req.body);
+//         const newTour = await Tour.create(req.body);
+//         console.log(newTour);
+//         res.status(201).json({
+//             status: 'success'
+//             // data: newTour
+//         })
+
+//     } catch(err) {
+//         console.log(err);
+//         res.status(500).json({
+//             status: 'fail',
+//             message: 'Internal Server Error',
+//             details: err
+//         })
+//     }
+// } 
+
 
 // ================================ Querying ======================================== //
 
@@ -281,7 +301,7 @@ exports.updateTour = async (req, res) => {
   try {
         let tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {  
             new: true,
-            runValidators: true
+            runValidators: true     // to check all validators in the model on all entered values..
         });
 
         // Now, let's send the newly updated document to the client..
