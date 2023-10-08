@@ -22,11 +22,24 @@ const tourSchema = new mongoose.Schema({
     },
     difficulty: {
         type: String,
-        required: [true, 'A tour should have a difficulty']
+        required: [true, 'A tour should have a difficulty'],
+        // A validator to choose between some values ...
+        // enum: ['easy', 'midium', 'difficult']       
+
+        // But to specify an error message, we have to create an object with two fields..
+        enum: {
+            values: ['easy', 'midium', 'difficult'],
+            message: 'You have to choose one of these values {easy, midium, difficult}'
+        }
+
+        // NOTE: enum can be applied only on strings..
     },
     ratingAverage: {
         type: Number,
-        default: 4.5
+        default: 4.5,
+        max: [5, 'Rating cannot be greater than 5'],
+        min: [1, 'Rating cannot be less than 5']
+
     },
     ratingQuantity: {
         type: Number,
@@ -35,7 +48,9 @@ const tourSchema = new mongoose.Schema({
     rating: {
         type: Number,
         // if we create a document with no rating, the rating will be set to "4.5"
-        default: 4.5
+        default: 4.5,
+        max: [5, 'Rating cannot be greater than 5'],
+        min: [5, 'Rating cannot be less than 5']
     }, 
     price: {
         type: Number,

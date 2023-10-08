@@ -312,7 +312,8 @@ exports.updateTour = async (req, res) => {
     } catch (err) {
         res.status(500).json({
         status: 'fail',
-        message: 'Internal Server Error'
+        message: 'Internal Server Error',
+        details: err
     });
   }
 }
