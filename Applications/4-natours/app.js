@@ -2,6 +2,7 @@
 const express = require('express');
 const app = express();
 
+process.env.NODE_ENV = 'production';
 // Import Routers for (users) & (tours)
 
 // const tourRouter = require(`${__dirname}/routes/tourRoutes`);

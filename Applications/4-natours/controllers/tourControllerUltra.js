@@ -4,7 +4,7 @@
 const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
-
+const AppError = require('../utils/appError');
 // We will move this function to a new module in "utils" ==> "catchAsync.js"
 /*
 const catchAsync = fn => {
@@ -60,6 +60,11 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 exports.getTour = catchAsync(async (req, res, next) => {
     const tour = await Tour.findById(req.params.id);
 
+    if(!tour) {
+        return next(new AppError('No tour found with that ID', 404));
+        // NOTE: return here is to stop the following code in this function from execution..
+        // To prevent the error comming from sending more than one response..
+    }
     res.status(200).json({
         status: 'success',
         result: tour
