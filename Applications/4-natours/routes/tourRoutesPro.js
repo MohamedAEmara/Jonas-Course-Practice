@@ -4,7 +4,7 @@ const router = express.Router();
 const tourControllerPro = require('./../controllers/tourControllerProMax');     // I changed the path to "tourControllerProMax" 
                                                                                 // now, "tourControllerPro" is for study only.
 
-
+const tourControllerUltra = require('./../controllers/tourControllerUltra');
 
 
 router
@@ -17,25 +17,31 @@ router
 
 router
     .route('/monthly-plan/:year')
-    .get(tourControllerPro.getMonthlyPlan);
+    .get(tourControllerUltra.getMonthlyPlan);
+
+
+// Note '/top-5-tours' has to be before '/:id' route ..
+// otherwise, express will take (top-5-tours) as a params.id which will catch an error.
+router
+    .route('/top-5-tours')
+    .get(tourControllerUltra.aliasTopTours, tourControllerUltra.getAllTours);
 
 
 router
     .route('/:id')
-    .get(tourControllerPro.getTour)
-    .patch(tourControllerPro.updateTour)
-    .delete(tourControllerPro.deleteTour);
+    .get(tourControllerUltra.getTour)
+    .patch(tourControllerUltra.updateTour)
+    .delete(tourControllerUltra.deleteTour);
 
 
-router
-    .route('/top-5-tours')
-    .get(tourControllerPro.aliasTopTours, tourControllerPro.getAllTours);
 
 
 router
     .route('/')
-    .post(tourControllerPro.createTour)    
-    .get(tourControllerPro.getAllTours)
+    // .post(tourControllerPro.createTour)    
+    .post(tourControllerUltra.createTour)
+    .get(tourControllerUltra.getAllTours)
+    
     
     
 

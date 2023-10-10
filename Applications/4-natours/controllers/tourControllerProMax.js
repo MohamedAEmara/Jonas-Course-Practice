@@ -12,8 +12,8 @@ const APIFeatures = require(`${__dirname}/../utils/apiFeatures.js`);
 
 exports.aliasTopTours = (req, res, next) => {
   req.query.limit = '5';        // note: everything in query is a "string"
-  req.query.sort = '-ratingsAverage,price';
-  req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  req.query.sort = 'price';
+  req.query.fields = 'name,price,summary,difficulty';
   // Now, we're ready to send our reqest to the next function which is "getAllTours". 
   next(); 
 }
@@ -325,7 +325,7 @@ exports.deleteTour = async(req, res) => {
     const tour = await Tour.findByIdAndDelete(req.params.id).then(() => {
       console.log(tour);
       console.log('Deleted');
-      res.status(200).json({
+      res.status(204).json({
         status: 'success',
         message: 'Document Deleted Successfully'
       });
