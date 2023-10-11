@@ -49,7 +49,7 @@ console.log(app.get('env'));        // development..
 
 
 const port = 2000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`App running on port ${port} ...`);
 })
 
@@ -81,3 +81,27 @@ process.on('unhandledRejection', (err) => {
     process.exit();
   }) 
 })
+
+
+// Note: the uncaught exception has to be before the error itself
+// because otherwise, the listener won't be able to see the exception..
+// So, it's better to be at the top of our code...
+
+
+// Handling Uncaught Exceptions...
+// There are synchronous 
+
+process.on('uncaughtException', (err) => {
+  console.log('💥💥');
+  console.log(err.name, err.message);
+  
+  // This an "Sync" handler, so we don't have anything to do with the server..
+  // just exit() the process.
+  // server.close(() => {
+    process.exit();
+  // })
+})
+
+
+
+// console.log(x);     // Note that x is not defined... it should give us "uncaughtException"
