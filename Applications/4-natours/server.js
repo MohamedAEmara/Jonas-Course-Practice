@@ -24,7 +24,15 @@ mongoose
     // useCreateIndex: true,
     // useFindAndModify: false
   })
-  .then(() => console.log('DB connection successful!'));
+  .then(() => console.log('DB connection successful!'))
+  
+  // Before we add .catch() method, node doesn't know what to do in case of promise rejection..
+  // It will return "Unhandled Promise Rejection" in the console..
+
+  // .catch((err) => {
+  //   console.log(`Can't connect to the Database ❌❌`);
+
+  // })
 // console.log(process.env.DATABASE);
 // console.log(process.env);
 
@@ -52,3 +60,24 @@ app.listen(port, () => {
 
 // So, when I hit "$ npm start" ==> it will automatically execute the code
 // for "$ nodemon server.js"
+
+
+
+
+// Now, we're gonna add a global handler for "Unhandled Promise Rejection"
+// Note: when there is a rejection from a promise that's not handled, it emits a "Unhanlded Promise Rejection"
+// that we can listen for..
+
+process.on('unhandledRejection', (err) => {
+  console.log('😔😔');
+  console.log(err.name, err.message);
+
+  // To Shut Down the application we use:
+  // process.exit(1);      // code (0) ==>  stands for success && (1)  ==>  stands for unCaught Exception.
+
+  // We can also give the server some time to finish all the requests that are still pending..
+  // After that the process will be killed.
+  server.close(() => {
+    process.exit();
+  }) 
+})
