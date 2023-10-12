@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, `Please enter your name`],
-        minlength: [5, `Username can't be less than 5 characters`],
+        minlength: [3, `Username can't be less than 3 characters`],
         maxlength: [30, `Username can't be more than 30 characters`]
     },
     email: {
@@ -23,10 +23,11 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, 'Please add a password'],
-        minlength: [8, 'Password cannot be less than 8 characters']
+        minlength: [8, 'Password cannot be less than 8 characters'],
+        select: false       // password won't be showing up in any output..
     },
     confirmPassword: {
-        type: String,
+        type: String,   
         required: true,
         validate: {
             // This only works on "CREATE" & "SAVE"...
@@ -55,7 +56,9 @@ userSchema.pre('save', async function(next) {
     // otherwise, We'll encrypt the password
     // We'll use "bcryptjs" npm module
     // NOTE: hash() is async function
-    this.password = await bcrypt.hash(this.password, 15);
+    console.log('❤️❤️❤️');
+    console.log(this.password);
+    this.password = await bcrypt.hash(this.password, 10);
     this.confirmPassword = undefined;       // to hide it from the database..
     // if we didn't do that, any attacker can see passwords from "confirmPassword" field..
     // The use for this filed is just to ensure the equality of the two fields..
@@ -63,6 +66,25 @@ userSchema.pre('save', async function(next) {
     next();
 })
 
+
+// this is an "instance method", it's available for all users..
+userSchema.methods.isCorrectPassword =  function(candidatePassword, userPassword) {
+    // We passed userPassword as well.
+    // Because we set select to in password field
+    // So, this.password won't actually work.
+    // let encrypted = await bcrypt.hash(candidatePassword, 10);
+    // let tmp = await bcrypt.hash(candidatePassword, 10);
+    // console.log(encrypted);
+    // console.log(tmp);
+    // console.log(userPassword);
+    // return encrypted === userPassword;
+
+    return bcrypt.compareSync(candidatePassword, userPassword);
+        
+    
+    // We cannot compare them manually as "candidatePassword" is not hashed...
+    // But the "userPassword" is hashed..
+}
 
 const User = mongoose.model('User', userSchema);
 

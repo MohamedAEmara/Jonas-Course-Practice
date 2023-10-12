@@ -25,6 +25,9 @@ router.param('id', (req, res, next, val) => {   // the new added parameter "val"
 router.post('/signup', authController.signup);
 // We implemented it without .route() because there's nothing to compine in one single
 
+
+router.get('/login', authController.login);
+
 router
     .route('/')
     .get(getAllUsers)

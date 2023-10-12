@@ -7,7 +7,7 @@ const app = express();
 
 // const tourRouter = require(`${__dirname}/routes/tourRoutes`);
 const tourRouter = require('./routes/tourRoutesPro');
-const userRouter = require(`${__dirname}/routes/userRoutes`);
+const userRouter = require('./routes/userRoutes');
 
 const AppError = require('./utils/appError');
 const errorController = require('./controllers/errorController');
