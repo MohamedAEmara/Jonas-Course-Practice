@@ -37,7 +37,7 @@ mongoose
 // console.log(process.env);
 
 // To get the environment variables we're on now..
-console.log(app.get('env'));        // development..
+// console.log(app.get('env'));        // development..
 // Environment Variables: are global variables that are used to define the environment
 // in which a node app is running ...
 // This value is set by "Express"
@@ -67,7 +67,7 @@ const server = app.listen(port, () => {
 // Now, we're gonna add a global handler for "Unhandled Promise Rejection"
 // Note: when there is a rejection from a promise that's not handled, it emits a "Unhanlded Promise Rejection"
 // that we can listen for..
-
+/*
 process.on('unhandledRejection', (err) => {
   console.log('😔😔');
   console.log(err.name, err.message);
@@ -81,7 +81,7 @@ process.on('unhandledRejection', (err) => {
     process.exit();
   }) 
 })
-
+*/
 
 // Note: the uncaught exception has to be before the error itself
 // because otherwise, the listener won't be able to see the exception..
@@ -90,7 +90,7 @@ process.on('unhandledRejection', (err) => {
 
 // Handling Uncaught Exceptions...
 // There are synchronous 
-
+/*
 process.on('uncaughtException', (err) => {
   console.log('💥💥');
   console.log(err.name, err.message);
@@ -103,5 +103,5 @@ process.on('uncaughtException', (err) => {
 })
 
 
-
+*/
 // console.log(x);     // Note that x is not defined... it should give us "uncaughtException"

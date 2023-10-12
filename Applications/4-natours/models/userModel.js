@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const emailValidator = require('email-validator');
+const bcrypt = require('bcryptjs');
 
 // User has the following attributes:
 // name, email, photo, password, passwordConfirm
@@ -28,6 +29,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         validate: {
+            // This only works on "CREATE" & "SAVE"...
             validator: function(val) {
                 return this.password === val;
             },
@@ -38,5 +40,30 @@ const userSchema = new mongoose.Schema({
 
 
 
+// Now, we'll encrypt the password. As it's not acceptable to store passwords as plain text in DB
+// For security issues...
+
+// SO, we'll apply a "pre" hock on "save" to encrypt the password before storing them in DB.
+userSchema.pre('save', async function(next) {
+    // We want to encrypt the password if we are updating password or SignUp ..
+    // But if we update for example the name, we will not apply this hook
+    
+    // There is a built-in mongoose function that checks whether some field changed or not.
+    if(!this.isModified('password')) return;    // if it's not modified, exit this function and 
+                                                // go to the next middleware.
+    
+    // otherwise, We'll encrypt the password
+    // We'll use "bcryptjs" npm module
+    // NOTE: hash() is async function
+    this.password = await bcrypt.hash(this.password, 15);
+    this.confirmPassword = undefined;       // to hide it from the database..
+    // if we didn't do that, any attacker can see passwords from "confirmPassword" field..
+    // The use for this filed is just to ensure the equality of the two fields..
+
+    next();
+})
+
 
 const User = mongoose.model('User', userSchema);
+
+module.exports = User;
