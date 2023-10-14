@@ -6,6 +6,7 @@ const tourControllerPro = require('./../controllers/tourControllerProMax');     
 
 const tourControllerUltra = require('./../controllers/tourControllerUltra');
 
+const authController = require('./../controllers/authController');
 
 router
     .route('/tour-stats')
@@ -40,7 +41,9 @@ router
     .route('/')
     // .post(tourControllerPro.createTour)    
     .post(tourControllerUltra.createTour)
-    .get(tourControllerUltra.getAllTours)
+    .get(authController.protect, tourControllerUltra.getAllTours);      // Show all tours only if 
+                                                                        // user is logged in..
+                                                                        
     
     
     

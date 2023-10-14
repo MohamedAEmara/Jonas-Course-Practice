@@ -20,9 +20,15 @@ const errorController = require('./controllers/errorController');
 
 app.use(express.json());
 
+app.use((req, res, next) => {
+    console.log('❤️❤️❤️');
+    req.requestTime = new Date().toISOString();
+    console.log(req.headers);
+    next();
+})
+
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
-
 
 
 // If I add any middleware here after app.use() .. this means this route is not handled by each of the above routers..

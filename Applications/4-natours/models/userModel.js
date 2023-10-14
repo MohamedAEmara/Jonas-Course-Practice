@@ -36,7 +36,11 @@ const userSchema = new mongoose.Schema({
             },
             message: `PasswordConfirm field is not the same as Password`
         }
-    }
+    },
+    passwordChangedAt: {
+        type: Date,
+        required: true
+    }         // if the user doesn't have this property, the password didn't change.
 })
 
 
@@ -86,6 +90,23 @@ userSchema.methods.isCorrectPassword =  function(candidatePassword, userPassword
     // But the "userPassword" is hashed..
 }
 
-const User = mongoose.model('User', userSchema);
 
+
+userSchema.methods.changePasswordAfter = function(JWTTimestamp) {
+    if(this.passwordChangedAt) {
+        const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+        console.log('======================');
+        console.log(changedTimestamp, JWTTimestamp);
+
+        // if the time that token issued is before the last time password changed..
+        // The user has to login again..
+        return changedTimestamp > JWTTimestamp;
+    } 
+    // False ==> not changed 
+    return false;
+}
+
+
+const User = mongoose.model('User', userSchema);
+  
 module.exports = User;

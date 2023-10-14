@@ -17,8 +17,11 @@ class AppError extends Error {
         
         this.isOperational = true;      
         // Now, we built the Error Class that can be used in all Operational Errors.
-
         Error.captureStackTrace(this, this.constructor);
+        
+        this.message = message;
+        console.log('❎❎❎');
+        console.log(this);
     }
 }
 
