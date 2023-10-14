@@ -8,6 +8,10 @@ const tourControllerUltra = require('./../controllers/tourControllerUltra');
 
 const authController = require('./../controllers/authController');
 
+
+
+
+
 router
     .route('/tour-stats')
     .get(tourControllerPro.getTourStats);
@@ -32,7 +36,7 @@ router
     .route('/:id')
     .get(tourControllerUltra.getTour)
     .patch(tourControllerUltra.updateTour)
-    .delete(tourControllerUltra.deleteTour);
+    .delete(authController.protect, authController.restrictTo('admin', 'lead-guide'), tourControllerUltra.deleteTour);
 
 
 

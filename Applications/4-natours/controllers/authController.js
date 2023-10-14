@@ -24,7 +24,8 @@ exports.signup = catchAsync(async(req, res, next) => {
         password: req.body.password,
         confirmPassword: req.body.confirmPassword,
         passwordChangedAt: req.body.passwordChangedAt,
-        photo: req.body.photo
+        photo: req.body.photo,
+        role: req.body.role
     });
     console.log(newUser);
     // In the new version, we only allow fields tha we actually need to but in the new user document
@@ -146,3 +147,72 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.user = currentUser;
     next();
 })
+
+
+
+// Now, we'll implement some authorization, to give the some access to specific users...
+// Based on the type of the user, we give access to some routes...
+// For example, "standard users" cannot delete tours ... 
+
+// We'll add a middleware before deleting any tour..
+
+// NOTE: we cannot pass paramters to middleware function, but we actually need to pass an array 
+//       of authorized people that can delete tours ....
+// So we'll create a wrapper function that returns a middleware function that we actually want to create.
+
+
+exports.restrictTo = (...roles) => {
+    return (req, res, next) => {
+        // So, this function has access to roles..
+        // users that have access are [roles]
+        // so if the user is in this array return true..
+
+
+
+        // Note that in the previous "middleware" (protect) we added a new object to "req", so, now we have access to it..
+
+        if(!roles.includes(req.user.role)) {           // "indlues" is a js method that's availble on Arrays.
+            next(new AppError(`You dont't have permission to perform this operation`, 403));        // 403  ==>   forbidden
+        }
+
+
+        // If all things are alright...
+        next();     // go to the next middleware ==> deleteTour.
+    }
+}
+
+
+// Now, we'll implement a Reset-Password function
+// First, we'll send post request (forgotPassword) with email address.
+// Then, create a "Reset Token" and send that to the email address that was provided..
+// Just a simple random token, not  Json Web Token
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+    // 1- Get user based on POSTed email.
+    const user = await User.findOne({ email: req.body.email });         // Get the email from the post request
+                                                                        // We don't know ID, so used findOne()
+
+    // Verify if the user exists??
+    if(!user) {
+        return next(new AppError('There is no user with that email', 404));
+    }
+    // 2- Generate the random reset token.
+    const resetToken = user.createPasswordResetToken();
+
+
+    // await user.save();      // Because the previous function modifies the document of the current user in DB
+    // So, we need to save it.
+    // But to save, we have to validate all the data in req.body
+
+    // To deactivate all validators, we simply use this option..    { validateBeforeSave: false }   as a parameter in save()
+    await user.save({ validateBeforeSave: false });
+    // This is a very life-saver mongoose option, and there are a lot in documentation.. "No need to know them all just some search to find the what you want"
+
+    console.log(resetToken);
+    console.log()
+    
+    // 3- Send it back as an email.
+
+});
+
+exports.resetPassword = (req, res, next) => {}

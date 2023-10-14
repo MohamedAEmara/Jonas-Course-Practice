@@ -21,6 +21,9 @@ router.param('id', (req, res, next, val) => {   // the new added parameter "val"
 // We can make a middle ware that checks ID once before every function and export it.
 
 
+router.post('/forgotPassword', authController.forgotPassword);
+router.post('/resetPassword', authController.resetPassword);
+
 // route For signning up new users..
 router.post('/signup', authController.signup);
 // We implemented it without .route() because there's nothing to compine in one single

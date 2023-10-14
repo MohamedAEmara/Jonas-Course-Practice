@@ -1,3 +1,4 @@
+const crypto = require('crypto');           // Built-in Node Module..
 const mongoose = require('mongoose');
 const emailValidator = require('email-validator');
 const bcrypt = require('bcryptjs');
@@ -19,6 +20,11 @@ const userSchema = new mongoose.Schema({
         unique: [true, 'This mail is already taken'],
         lowercase: true     // The validator will automatically change the mail to "lowercase"
     },
+    role: {
+        type: String,
+        enum: ['user', 'guide', 'lead-guide', 'admin'],
+        default: 'user'
+    },
     photo: String,
     password: {
         type: String,
@@ -38,9 +44,10 @@ const userSchema = new mongoose.Schema({
         }
     },
     passwordChangedAt: {
-        type: Date,
-        required: true
-    }         // if the user doesn't have this property, the password didn't change.
+        type: Date
+    },         // if the user doesn't have this property, the password didn't change.
+    passwordResetToken: String,
+    passwordResetExpires: Date
 })
 
 
@@ -106,6 +113,28 @@ userSchema.methods.changePasswordAfter = function(JWTTimestamp) {
     return false;
 }
 
+
+
+userSchema.methods.createPasswordResetToken = function() {
+    const resetToken = crypto.randomBytes(32).toString('hex');  
+    // We specified the length of the strnig to be 32 and convert it to string..
+    
+    // After that we have to hide it, we cannot store it directly to the DB
+    // So, we'll encrypt it.
+
+    this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');    // so it's encrypted as a hex format.
+    // To store it into DB, we'll change the DB schema to include "passwordResetToken" and "passwordResetExpires"
+    // as this token has an expiry date.
+
+
+    this.passwordResetExpires = Date.now() + 600000;            // stands for 10 mins in milliseconds.
+
+    console.log(resetToken);
+    console.log('****************');
+    console.log(this.passwordResetToken);
+
+    return resetToken;
+}
 
 const User = mongoose.model('User', userSchema);
   
