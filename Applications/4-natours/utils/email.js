@@ -23,9 +23,9 @@ const sendEmail = async options => {
     // 2- Define the email options
     const mailOptions = {
         from: process.env.GMAIL_USERNAME,
-        to: process.env.TO,               // it's passed to this funciton in Options object.
-        subject: '❌HACKER❌',               
-        text: 'تخافش بهزر معاك'
+        to: options.email,               // it's passed to this funciton in Options object.
+        subject: options.subject,               
+        text: options.message
     }
 
     console.log(mailOptions);

@@ -22,7 +22,7 @@ router.param('id', (req, res, next, val) => {   // the new added parameter "val"
 
 
 router.post('/forgotPassword', authController.forgotPassword);
-router.patch ('/resetPassword', authController.resetPassword);
+router.patch ('/resetPassword/:token', authController.resetPassword);
 
 // route For signning up new users..
 router.post('/signup', authController.signup);
