@@ -7,6 +7,8 @@ const encrypt = require('bcryptjs');
 
 const { promisify } = require('util');
 
+const sendEmail = require('../utils/email');
+
 const signToken = id => {
     return jwt.sign({ id: id }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRES_IN
@@ -212,6 +214,32 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     console.log()
     
     // 3- Send it back as an email.
+    const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
+
+
+    const message = `Forget your password? Submit a PATCH request with you new password and confirmPassword to: ${resetURL}.\n`;
+
+
+    try {
+        await sendEmail({
+            email: user.email,
+            subject: 'Your password reset token (valid for 10 mins)',
+            message
+        });
+    
+    
+        res.status(200).json({
+            status: 'success',
+            message: 'token send to email'
+        });
+    } catch (err) {
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
+
+        await user.save({ validateBeforeSave: false });
+
+        return next(new AppError('There was an error sending the email. Try again later..', 500));
+    }
 
 });
 
