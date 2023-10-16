@@ -3,7 +3,7 @@ const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const jwt = require('jsonwebtoken');
 const AppError = require('../utils/appError');
-const encrypt = require('bcryptjs');
+const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
 
@@ -16,6 +16,20 @@ const signToken = id => {
         expiresIn: process.env.JWT_EXPIRES_IN
     });
 }
+
+
+const createAndSendToken = (user, statusCode, res) => {
+    const token = signToken(user._id);
+
+    res.status(statusCode).json({
+        status: 'success',
+        token,
+        data: {
+            user
+        }
+    });
+}
+
 
 exports.signup = catchAsync(async(req, res, next) => {
     // const newUser = await User.create(req.body);
@@ -31,6 +45,10 @@ exports.signup = catchAsync(async(req, res, next) => {
         photo: req.body.photo,
         role: req.body.role
     });
+
+    // The whole previous object can be simplifed in one line as follows
+    const superUser = await User.create(req.body);
+
     console.log(newUser);
     // In the new version, we only allow fields tha we actually need to but in the new user document
 
@@ -43,7 +61,8 @@ exports.signup = catchAsync(async(req, res, next) => {
     // We can also specify a vlid time for this token.. and after that it's not valid any more..
     // so, we'll add an additional security measure..
     // by passing options as an Object.
-
+    
+    /*
     const token = signToken(newUser._id);
 
     // Now, as we created the token, we have to send it back to the client..
@@ -54,6 +73,9 @@ exports.signup = catchAsync(async(req, res, next) => {
         token               // from the user.
         // So, we'll execlude it by specifying "select :false" in User Model
     });
+    */
+
+    createAndSendToken(newUser._id, 201, res);  
 });
 
 
@@ -85,13 +107,14 @@ exports.login = catchAsync(async (req, res, next) => {
     console.log(user.password);
     console.log(password);
     const correct = await user.isCorrectPassword(password, user.password); 
-
+    console.log('correct ' + correct);
     if(!correct) {
         console.log(user);
         console.log(correct);
         return next(new AppError('Incorrect email or password', 401));      // 401  ==>  UnAuthorized       
     }
     // 3- If everything is OK, send the token to the client..
+    /*
     const token = signToken(user._id);
     
 
@@ -99,6 +122,8 @@ exports.login = catchAsync(async (req, res, next) => {
         status: 'success',
         token
     });
+    */
+    createAndSendToken(user, 200, res);
 });
 
 
@@ -278,11 +303,161 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
     // 4- Log the user in, send JWT
 
+    // const token = signToken(user._id);
+
+    // res.status(200).json({
+    //     status: 'success',
+    //     token
+    // });
+
+    createAndSendToken(user, 200, res);
+});
+
+
+
+
+// exports.updatePassword = async (req, res, next) => {
+//     // This is only available for "LoggedIn" users (users with valid tokens) & also they have to pass the current password.
+    
+//     // 1- Get the user from the collection
+//     let user = await User.findOne({ email: req.body.email }).select('+password');
+//     // .select('+password')      ==>    to be able to access password of this user..
+
+//     if(!user) {
+//         return next(new AppError('There is no user with this email!!', 400));       // Bad Request..
+//     }
+
+//     // 2- Check if the posted password is correct
+//     const password = User.findOne({ email: req.body.email });
+//     const confirmPassword = req.body.confirmPassword;
+
+//     console.log(password);
+//     console.log('🙋‍♂️🙋‍♂️');
+//     const correct = await user.isCorrectPassword(req.body.password, password); 
+    
+//     console.log(password);
+//     console.log('=--=-=-=-=-=-=-=-=');
+//     console.log(confirmPassword);
+
+//     if(!correct) {
+//         return next(new AppError('Wrong Password !!', 400));
+//     }
+
+
+//     if(password !== confirmPassword) {
+//         return next(new AppError('password & confirmPassword must be the same!!', 400));
+//     }
+
+//     // 3- If so, Update password
+//     user.password = await bcrypt.hash(user.password, 10);
+//     user.confirmPassword = user.password;
+//     // user.confirmPassword = undefined;       // to hide it from the database..
+
+//     // user = await User.findOneAndUpdate( {email: req.body.email}, {password: req.body.newPassword}, {runValidators: true});
+//     // cosnt tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {  
+//     //     new: true,
+//     //     runValidators: true     // to check all validators in the model on all entered values..
+//     // });
+    
+//     user.passwordChangedAt = Date.now() - 1000;
+//     await user.save();
+
+
+//     // user.confirmPassword = undefined;
+    
+//     // 4- Log user in, set JWT 
+//     const token = signToken(user._id);
+
+//     res.status(200).json({
+//         status: 'success',
+//         token
+//     });
+
+// }
+
+
+/*
+exports.updatePassword = catchAsync(async (req, res, next) => {
+    const { email, oldPassword, newPassword, confirmPassword } = req.body;
+    
+    console.log(email);
+    console.log(oldPassword);
+    console.log(newPassword);
+    console.log(confirmPassword);
+
+    const user = await User.findOne({ email: email }).select('+password');
+    console.log('💥💥');
+    console.log(user);
+    if(!user) {
+        return next(new AppError('the email your entered is not registered yet!!'));
+    }
+
+    const password = user.password;
+
+    const correct = await user.isCorrectPassword(oldPassword, password); 
+
+    if(!correct) {
+        return next(new AppError('The oldPassword is not correct!!'));
+    }
+
+
+    if(newPassword !== confirmPassword) {
+        return next(new AppError('newPassword and confirmPassword are not the same!!'));
+    }
+
+    // const encryptedPassword = (await bcrypt.hash(newPassword, 10));
+    // console.log('type of encryptedPass: ' + typeof(encryptedPassword));
+    
+    // The problem that I encrypted the password here, and it's already being encrypted 
+    // in the pre middleware, so in this case it will be encrypted twice XXXX
+
+
+    user.password = newPassword;
+
+    user.passwordChangedAt = Date.now();
+
+
+    user.confirmPassword = newPassword;
+
+    user.save();
     const token = signToken(user._id);
 
     res.status(200).json({
         status: 'success',
         token
     });
-    
 });
+*/
+// The previous updatePassword is the function implemented by me..
+// I'll keep it as is, and reimplent another function along with Jonas..
+
+
+
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+    // 1- Get the user from collection..
+    const user = await User.findById(req.user.id).select('+password');      // the user passed from the previous middleware..
+
+    // 2- Check if POSTed current password is correct ?
+    const correct = await user.isCorrectPassword(req.body.currentPassword, user.password);
+
+    if(!correct) {
+        return next(new AppError('Your current password is wrong.', 401));
+    }
+
+    // 3- If so, Update the password
+    user.password = req.body.newPassword;
+    user.confirmPassword = req.body.confirmPassword;
+    
+    // Note: all encrypting the password && validation of (password = confirmPassword) && adding the current date as passwordChangedAt 
+    //       are done inside the userModel in the "pre save" middleware
+    
+    await user.save();
+
+
+
+    // Log user in, send JWT
+    createAndSendToken(user, 200, res);
+
+
+})

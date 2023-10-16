@@ -24,6 +24,11 @@ router.param('id', (req, res, next, val) => {   // the new added parameter "val"
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch ('/resetPassword/:token', authController.resetPassword);
 
+router.patch('/updatePassword', authController.protect, authController.updatePassword); 
+// We used ".protect" because we want only logged in users can access this route..
+// And to updatePassword, your first have to attach the "token" in Authorization after "Bearer" 
+
+
 // route For signning up new users..
 router.post('/signup', authController.signup);
 // We implemented it without .route() because there's nothing to compine in one single
