@@ -4,7 +4,7 @@ const router = express.Router();
 
 
 // Another way to import modules from Controllers modules is to name all functions to include..
-const {getAllUsers, getUser, createUser, deleteUser, updateUser, updateMe} = require('./../controllers/userController');
+const {getAllUsers, getUser, createUser, deleteUser, updateUser, updateMe, deleteMe} = require('./../controllers/userController');
 const authController = require('../controllers/authController');
 // Let's create a middleware that acesses the parameter id from our URL
 
@@ -31,6 +31,8 @@ router.patch('/updatePassword', authController.protect, authController.updatePas
 
 router.patch('/updateMe', authController.protect, updateMe);
 
+
+router.delete('/deleteMe', authController.protect, deleteMe);
 // route For signning up new users..
 router.post('/signup', authController.signup);
 // We implemented it without .route() because there's nothing to compine in one single

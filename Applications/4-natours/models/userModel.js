@@ -47,7 +47,12 @@ const userSchema = new mongoose.Schema({
         type: Date
     },         // if the user doesn't have this property, the password didn't change.
     passwordResetToken: String,
-    passwordResetExpires: Date
+    passwordResetExpires: Date,
+    active: {
+        type: Boolean,
+        default: true,
+        select: false
+    }
 })
 
 
@@ -145,6 +150,30 @@ userSchema.pre('save', function(next) {
     next();                                             // So, the user can login with this token.
 })
 
+
+
+
+// We'll implement a query middleware to prevent "Deleted" users from accessing or logging in.
+
+userSchema.pre(/^find/, function(next) {    // Any query starting with "find" will apply this middleware on first. 
+    // this points to current query..
+    this.find({active: {$ne: false}});      // filter only active documents...
+    // NOTE: active documents are document that don't have the property {active: false}
+    // Because some documents are added before we set this default value {active: true} 
+    next();
+});
+
+
+
+
+
+
+
 const User = mongoose.model('User', userSchema);
   
+
+ 
+
+
+
 module.exports = User;

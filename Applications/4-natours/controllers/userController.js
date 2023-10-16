@@ -109,3 +109,14 @@ exports.updateMe = (async (req, res, next) => {
         }
     })
 })
+
+
+exports.deleteMe = catchAsync( async(req, res, next) => {
+    // the logged-in user stored in req from the preivous middleware "protect"
+    await User.findByIdAndUpdate(req.user._id, {active: false});
+
+    res.status(204).json({      // 204 ==> for deleted.
+        status: 'success',
+        data: null
+    });
+})
