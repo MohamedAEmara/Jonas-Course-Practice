@@ -2,6 +2,8 @@
 const express = require('express');
 const app = express();
 
+const rateLimit = require('express-rate-limit');
+
 // process.env.NODE_ENV = 'production';
 // Import Routers for (users) & (tours)
 
@@ -26,6 +28,31 @@ app.use((req, res, next) => {
     console.log(req.headers);
     next();
 })
+
+
+// Implement Rate-Limiter to prevent attackers from login many times or slow down the response of our application
+// We use "express-rate-limit" module for that..
+
+// rateLimit is a function that recieves an object of options..
+const limiter = rateLimit({
+    // Here we specify how many requests of the same ID we want to allow in a certain amount of time..
+    
+    // We'll make it 100 requests per hour
+    max: 100,
+    windowMs: 60 * 60 * 100,
+    
+    // message when this limit is exceeded.
+    message: 'Too many request from this IP!! Please try again in an hour.'
+    // statusCode: 429 (too many requests)
+});
+// This function creates a "middleware" function, 
+// that we can use using "app.use()"
+app.use('/api/', limiter)       // only use "limiter" on requests from "/api"
+
+// NOTE: We'll get in the "headers" tab a new properties like:
+// RateLimit-Limit: value
+// RateLimit-Remainnig: value
+
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
@@ -95,6 +122,10 @@ app.use(errorController);
 
 // Now we can access all files related to the root "public" using '/'
 // GREATTTTT..
+
+
+
+
 
 
 module.exports = app;
