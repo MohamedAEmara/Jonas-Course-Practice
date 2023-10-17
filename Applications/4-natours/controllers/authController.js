@@ -21,6 +21,23 @@ const signToken = id => {
 const createAndSendToken = (user, statusCode, res) => {
     const token = signToken(user._id);
 
+    const cookieOptions = {
+        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN*240*60*60*100),   // JWT_COOKIE_EXPIRES_IN is in days, so we converted into millisecs.
+        // The browser will delete the cookie after it has expired.
+
+        // secure: true,       // https    ==>     we just want this part when in production.
+        
+        httpOnly: true      // This means that cookies cannot been accessed or modified in any way by the browser.
+        // Just receive, store, and send it back..
+    }
+
+
+    if(process.env.NODE_ENV === 'production') {
+        cookieOptions.secure = true;        // use https when in production.
+    }
+    // To send a cookie, we simply use "res.cookie()"
+    res.cookie('jwt', token, cookieOptions)
+
     res.status(statusCode).json({
         status: 'success',
         token,
