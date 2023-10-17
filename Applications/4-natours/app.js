@@ -1,8 +1,18 @@
 // here, we keep the application configuration in one standalone file...
 const express = require('express');
 const app = express();
-
+const helmet = require('helmet');
+const Mongosanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean')
+// Now, we'll use a middleware for best bractices for security..
+// It's called "helmet"
+// npm i helmet
+app.use(helmet());
+// NOTE: in app.use() we need to pass a (function) NOT a (function call)
+// It's best practice to put it as a "first middleware"
 const rateLimit = require('express-rate-limit');
+
+
 
 // process.env.NODE_ENV = 'production';
 // Import Routers for (users) & (tours)
@@ -20,7 +30,22 @@ const errorController = require('./controllers/errorController');
 //     console.log(`App listenning on port ${port} ....`);
 // });
 
-app.use(express.json());
+app.use(express.json({ limit: '10kb' }));        // We can limit the size of the data in the body using "limit"
+
+
+// Data Sanitization against NoSQL query injection:
+// Query injection is to write a "NoSQL" code instead of a plain object
+// This query will be executed and returns retults from DB
+
+// npm i express-mongo-sanitize
+// npm i xss-clean 
+
+app.use(Mongosanitize());     // This will filter out all "." and "$" from (req.params) or (req.body) 
+
+
+// Data Sanitization against XSS attacks
+app.use(xss());
+// This will protect us from any JS code attached to the request..
 
 app.use((req, res, next) => {
     console.log('❤️❤️❤️');
