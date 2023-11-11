@@ -116,7 +116,33 @@ const tourSchema = new mongoose.Schema({
     secretTour: {
         type: Boolean,
         default: false
-    }
+    }, 
+    startLocation: {
+        // Mongo has a data type called: GeoJson    ==>     It allows us to represent location with many ways
+        // For example we can use lon & lat to specify the location. or a polygon, Lines, ...
+        type: {
+            type: String,
+            default: 'Point',       // Default is Point
+            enum: ['Point']         // And it cannot be any thing but Point.
+        },
+        coordinates: [Number],   // Array of numbers.
+        address: String,
+        description: String,
+    },
+    locations: [
+        {
+            type: {
+                type: String,
+                default: 'Point',
+                enum: ['Point']
+            },
+            coordinates: [Number],
+            address: String,
+            description: String,
+            day: Number             // The day of the tour on which tourists will go to this location.
+        }
+    ],
+    // NOTE: we also can delete the "StartLocation" and set the first element in "locations" to be a "startLocation"
 },
 {
     toJSON: { virtuals: true},          // This tells our schema to show (virtual properties)      
