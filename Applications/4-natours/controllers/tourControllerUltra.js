@@ -37,40 +37,12 @@ exports.createTour = catchAsync(async (req, res, next) => {
 
 
 
-exports.getAllTours = catchAsync(async (req, res, next) => {
-    const features = new APIFeatures(Tour.find(), req.query)
-        .filter()
-        .sort()
-        .limitFields()
-        .paginate();
-
-    const tours = await features.query;
-
-    res.status(200).json({
-        status: 'success',
-        results: tours.length,
-        data: {
-            tours
-        }
-    });
-});
+exports.getAllTours = getAll(Tour);
 
 
 
 
-exports.getTour = catchAsync(async (req, res, next) => {
-    const tour = await Tour.findById(req.params.id);
-
-    if(!tour) {
-        return next(new AppError('No tour found with that ID', 404));
-        // NOTE: return here is to stop the following code in this function from execution..
-        // To prevent the error comming from sending more than one response..
-    }
-    res.status(200).json({
-        status: 'success',
-        result: tour
-    });
-});
+exports.getTour = factory.getOne(Tour, { path: review });   // path is the field that the population will be stored in
 
 
 
