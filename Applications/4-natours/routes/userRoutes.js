@@ -28,6 +28,11 @@ router.patch('/updatePassword', authController.protect, authController.updatePas
 // We used ".protect" because we want only logged in users can access this route..
 // And to updatePassword, your first have to attach the "token" in Authorization after "Bearer" 
 
+// GetMe    ==>     Gets all info about logged in user
+router.get('/me', authController.protect, userController.getMe, userController.getUser);
+// Instead of passing my id, I used a middleware to pass the logged-in user-id as a params.
+
+
 
 router.patch('/updateMe', authController.protect, updateMe);
 

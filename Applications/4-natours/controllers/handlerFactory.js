@@ -73,7 +73,7 @@ exports.getOne = (Model, populateOptions) => catchAsync(async (req, res, next) =
 
 
 
-exports.getAll = (Model, populateOptions) => catchAsync(async (req, res, next) => {
+exports.getAll = (Model) => catchAsync(async (req, res, next) => {
     const features = new APIFeatures(Model.find(), req.query)
         .filter()
         .sort()
@@ -90,3 +90,11 @@ exports.getAll = (Model, populateOptions) => catchAsync(async (req, res, next) =
         }
     });
 });
+
+
+// All we need here is to make the (req.params.id =  req.user.id)
+exports.getMe = (req, res, next) => {
+    req.params.id = req.user.id;
+    next(); 
+}
+// Now, what I need is to add this middleware before "getUser"
