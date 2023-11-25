@@ -33,3 +33,17 @@ exports.deleteOne = (Model) => catchAsync(async(req, res, next) => {
         data: null
     });
 })
+
+
+
+exports.updateOne = Model => catchAsync(async(req, res, next) => {
+    const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true
+    });
+
+    res.status(200).json({
+        status: 'success',
+        data: doc
+    });
+})

@@ -5,6 +5,7 @@ const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
 // We will move this function to a new module in "utils" ==> "catchAsync.js"
 /*
 const catchAsync = fn => {
@@ -73,19 +74,19 @@ exports.getTour = catchAsync(async (req, res, next) => {
 
 
 
-exports.updateTour = catchAsync(async(req, res, next) => {
-    const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true
-    });
+// exports.updateTour = catchAsync(async(req, res, next) => {
+//     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+//         new: true,
+//         runValidators: true
+//     });
 
-    res.status(200).json({
-        status: 'success',
-        data: tour
-    });
-})
+//     res.status(200).json({
+//         status: 'success',
+//         data: tour
+//     });
+// })
 
-
+exports.updateTour = factory.updateOne(Tour);
 
 
 // exports.deleteTour = catchAsync(async(req, res, next) => {
@@ -101,7 +102,6 @@ exports.updateTour = catchAsync(async(req, res, next) => {
 // })
 
 // We'll use the function created from "handleFactory" module 
-const factory = require('./handlerFactory');
 
 exports.deleteTour = factory.deleteOne(Tour);
 
