@@ -151,6 +151,35 @@ const tourSchema = new mongoose.Schema({
 
 
 
+// ======================================= Indexes ========================================== // 
+/**
+ * Index is an efficient way to search for specific elements based on specific fields.
+ * By default, mongo creates an index for (ID), but if we want to search based on the price for example
+ * This won't be efficient, and mongo has to check all the documents to search for some value.
+ * 
+ * 
+ * 
+ * Now, we'll create other indexes other than (price) to use when searching.
+ */
+
+// To create index:
+tourSchema.index({ price: 1 })
+// 1 for increasing && -1 for decreasing.
+// Now, the index has been created and when we search for documents based on their prices, the search will be faster.
+
+// When we create a "Unique" field in our schema, Mongo will automatically create index for that field. 
+
+// To use more than one attribute with same index:
+tourSchema.index({ price: 1, ratingAverage: -1}); 
+// This is helpful when we want to filter based on price & ratingAverage together.      
+
+////////////// NOTE:
+// The size of created index is much bigger than the size of the documents itself.
+
+////////////// NOTE: 
+// If you deleted the index from your code (commented it), it still exists in the database, 
+// So, it's better to delete it from the database manually to use this space.
+
 // =============================== Virtual Properties ====================================== // 
 // We sometimes need to store some properties like: "distance in Kilometres and Miles"
 // No need to store both them in our database as one can be deriven from the other one..
