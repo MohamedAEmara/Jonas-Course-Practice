@@ -21,29 +21,42 @@ router.param('id', (req, res, next, val) => {   // the new added parameter "val"
 // We can make a middle ware that checks ID once before every function and export it.
 
 
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> NOTE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// The following 4 routes don't need to be authenticated. 
+router.post('/signup', authController.signup);
+// We implemented it without .route() because there's nothing to compine in one single
+router.get('/login', authController.login);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch ('/resetPassword/:token', authController.resetPassword);
 
-router.patch('/updatePassword', authController.protect, authController.updatePassword); 
+
+
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BUT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// All following routes need to be authenticated So, instead of repeating the middleware
+// authController.protect in every route
+// We can use it before all of them here. And this works the same.
+app.use(authController.protect);
+
+// Now we can remove all protect middleware from the following routes.
+
+router.patch('/updatePassword', authController.updatePassword); 
 // We used ".protect" because we want only logged in users can access this route..
 // And to updatePassword, your first have to attach the "token" in Authorization after "Bearer" 
 
 // GetMe    ==>     Gets all info about logged in user
-router.get('/me', authController.protect, userController.getMe, userController.getUser);
+router.get('/me', userController.getMe, userController.getUser);
 // Instead of passing my id, I used a middleware to pass the logged-in user-id as a params.
 
 
 
-router.patch('/updateMe', authController.protect, updateMe);
+router.patch('/updateMe', updateMe);
 
 
-router.delete('/deleteMe', authController.protect, deleteMe);
+router.delete('/deleteMe', deleteMe);
 // route For signning up new users..
-router.post('/signup', authController.signup);
-// We implemented it without .route() because there's nothing to compine in one single
 
-
-router.get('/login', authController.login);
 
 router
     .route('/')
