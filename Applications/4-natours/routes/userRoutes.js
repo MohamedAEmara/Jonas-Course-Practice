@@ -69,5 +69,6 @@ router
     .patch(updateUser)
     .delete(deleteUser);
 
+// We can also use the middleware "restricTo('admin')" for example for some routes like "GetAllUsers".
 module.exports = router;
 

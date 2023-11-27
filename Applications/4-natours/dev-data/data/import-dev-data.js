@@ -5,10 +5,14 @@ const dotenv = require('dotenv');           // we need dotevn to be able to conn
 dotenv.config({path: './config.env'});  
 
 const Tour = require('../../models/tourModel');     // We need to access Tour model 
+const User = require('../../models/userModel');    
+// const Tour = require('../../models/reviewModel');     
 const mongoose = require('mongoose');   
 
 let stringConnection = process.env.DATABASE;
 const DB = stringConnection.replace("<PASSWORD>", process.env.DATABASE_PASSWORD);
+
+console.log(DB);
 
 mongoose
   .connect(DB, {
@@ -23,12 +27,23 @@ mongoose
 // const tours = JSON.parse(fs.readFileSync('./tours-simple.json', 'utf-8'));
 // Note, the ./ way is relative to the root file not the current file
 // so, it's safer to use (__dirname) variable instead..
-const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-8'));
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
+const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, 'utf-8'));
+// const reviews = JSON.parse(fs.readFileSync(`${__dirname}/reviews-simple.json`, 'utf-8'));
 
 
 // Import data into Database...
 const importData = async () => {
     try {
+        // await Tour.create(tours);
+        await User.create(users, { validateBeforeSave: false });    // to turn of validations. Because this data doens't contain "confirmPassword" field.
+    
+    
+        // Another thing to do: 
+        // is to turn off (password encryption)
+        // Because passwords are already stored "encrypted"
+        ////////////////// From User Model //////////////////
+        
         await Tour.create(tours);
         console.log('data successfully Loaded 😊');
 
@@ -57,6 +72,7 @@ const importData = async () => {
 const deleteData = async () => {
     try {
         await Tour.deleteMany();
+        await User.deleteMany();
         console.log('all documents deleted successfully 💥');
 
         // Note that the process will still running even after deleting all the document.
@@ -93,3 +109,8 @@ if(process.argv[2] === '--import') {
 
 
 
+
+
+// To import from file or delete:
+// $ node ./dev-data/data/import-dev-data.js --import
+// $ node ./dev-data/data/import-dev-data.js --delete
