@@ -52,6 +52,73 @@ reviewSchema.pre(/^find/, function(next) {
   next();
 });
 
+
+
+
+
+
+
+
+
+
+
+reviewSchema.statics.calculateAverageRatings = async function(tourId) {
+    
+    // This refers to the current model.
+    const stats = await this.aggregate([
+        // We will pass all the stages we want 
+        // 1- Select all reviews that belong to the current tour (that is passed as an argument)
+        {
+            $match: { tour: tourId }
+        },
+        {
+            $group: {
+                // in "_id", we specify all the document that are in common.
+                _id: '$',
+                nRating: { $sum: 1 },       // Add 1 for every matching id document
+                avgRating: { $avg: '$rating' }
+            }
+        }
+    ]);
+
+
+    // Now, the tours collection knows nothing about this aggregation and the values I've just calculated.
+    // We'll update the (tours) collection with new ratings values...
+    // All new values are stored in (stats). Actually stats is an array.
+
+    await Tour.findByIdAndUpdate(tourId, {
+        ratingQuantity: stats[0].nRating,
+        ratingAverage: stats[0].avgRating
+    });
+
+    console.log(stats);
+}
+// We want  to call this function each time a new review is created to update the (number of ratings) & (rating average)...
+// We'll use a "middleware" to do so.
+
+// NOTE: it's a (post) middleware not pre to be able to see the tourId in $match:
+reviewSchema.pre('save', function() {
+    // This here points to the current review.
+    
+    // Review.calculateAverageRatings(this.tour);      // Because (this) points to the current review. we here passed the tourId of this review.
+    // Because Reviews is not declared yet..........
+    
+    // We can use the (this.constructor) which points to the model who created that document (this) 
+    // which is equivalent to (Review)...
+    this.constructor.calculateAverageRatings(this.tour);
+
+    // next();          // Post middleware has no access to "next"...
+})
+
+
+
+
+
+
+
+
+
+
 const Review = mongoose.model('Review', reviewSchema);
 
 module.exports = Review;
