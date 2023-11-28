@@ -86,10 +86,12 @@ reviewSchema.statics.calculateAverageRatings = async function(tourId) {
     // We'll update the (tours) collection with new ratings values...
     // All new values are stored in (stats). Actually stats is an array.
 
-    await Tour.findByIdAndUpdate(tourId, {
-        ratingQuantity: stats[0].nRating,
-        ratingAverage: stats[0].avgRating
-    });
+    if(stats.length > 0) {      // To make sure we at least have a review on this tour. To avoid reading "undefined"
+        await Tour.findByIdAndUpdate(tourId, {
+            ratingQuantity: stats[0].nRating,
+            ratingAverage: stats[0].avgRating
+        });
+    }
 
     console.log(stats);
 }
@@ -118,6 +120,45 @@ reviewSchema.pre('save', function() {
 
 
 
+// =========================================== Delete & Update ================================================= //
+// Now, we want to update nRating & avgRating whenever a user deletes or updates a review.
+
+// This is when the user use any of the:
+/*
+    findByIdAndUpdate
+    findByIdAndDelete
+*/
+
+// We'll use a pre middleware for that..  for all queries starts with (findOneAnd....) 
+// NOTE: findByIdAndUpdate is a short and contains internally (findOneAnd...)
+
+reviewSchema.pre(/^findOneAnd/, async function(next) {
+    const rev = await this.findOne();
+    // To be able to see and manipulate the document itself.
+    console.log(rev);
+    
+
+    // We'll pass the (rev) to the next middleware by adding it to (this)
+    this.rev = await this.findOne(); 
+    console.log(this.rev);
+
+    // NOTE: here we cannot use (post). Becuase in that case, we'll have no access to rev as the document will be delted or edited.
+
+    next();
+});
+
+
+reviewSchema.post(/^findOneAnd/, async function() {
+    // await this.findOne()         ===>  DOES NOT work because the query is already executed..
+
+    // Here we want to have access to (rev) we just created...
+    // A nice trick to do so is to add it to (this)
+    await this.rev.calculateAverageRatings(this.rev.tour); 
+    // Cool, we now have access to this.rev and it contains all data about the review...
+    // So, we can pass the tour to get the average...
+
+    // Now, ratingAVG & numRating are updated automatically whenever we perform Create, Update, Delete operations on reveiws.
+})
 
 const Review = mongoose.model('Review', reviewSchema);
 
