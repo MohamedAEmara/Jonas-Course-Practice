@@ -54,7 +54,10 @@ const tourSchema = new mongoose.Schema({
         type: Number,
         default: 4.5,
         max: [5, 'Rating cannot be greater than 5'],
-        min: [1, 'Rating cannot be less than 1']
+        min: [1, 'Rating cannot be less than 1'],
+        // "set:"   --->   the function in (set) will run every time we add or edit a document 
+        set: val => Math.round(val * 10) / 10       // To round for one decimal place.
+
 
     },
     ratingQuantity: {
