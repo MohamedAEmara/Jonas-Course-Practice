@@ -160,6 +160,19 @@ reviewSchema.post(/^findOneAnd/, async function() {
     // Now, ratingAVG & numRating are updated automatically whenever we perform Create, Update, Delete operations on reveiws.
 })
 
+
+
+
+
+
+
+
+
+// ----------------------- index(user, tour) ---------------------- //
+// Now, we'll create an index for both user & tour to make them unique together 
+// To prevent one user from making more than one review..
+reviewSchema.index({ tour:1, user: 1 }, { unique: true });  // So, the combination of {tour,user} will always be unique. 
+
 const Review = mongoose.model('Review', reviewSchema);
 
 module.exports = Review;
