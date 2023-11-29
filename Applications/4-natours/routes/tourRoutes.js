@@ -2,7 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const router = express.Router();
 
-const tourController = require('./../controllers/tourController');  
+const tourController = require('./../controllers/tourControllerUltra');  
 // This object contains all the functions in the module "tourController";
 // To access any of these functions we'll use the object name before..
 
@@ -38,4 +38,11 @@ router
     .delete(tourController.deleteTour);
 
 
+
+// A route for specifying the tours in distance X in unit Y 
+// Example:
+// /tours-distance/233/center/-40,45/unit/mi
+router.route('/tours-within/:distance/center/:latlng/unit/:unit', tourController.getToursWithin)
+
+router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
 module.exports = router;

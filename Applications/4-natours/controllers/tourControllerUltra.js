@@ -175,3 +175,90 @@ exports.aliasTopTours = (req, res, next) => {
     next(); 
 }
   
+
+
+// /tours-distance/233/center/-40,45/unit/mi
+// router.route('/tours-within/:distance/center/:latlng/unit/:unit')
+exports.getToursWithin = async (req, res, next) => {
+    const { distance, latlong, unit } = req.params;
+    const lat = latlong.split(',')[0];
+    const lng = latlong.split(',')[1];
+
+    if(!lat || !lng) {
+        next(new AppError('Please provide latitude and longitude in the format lat,lng.', 400));
+    }
+    
+
+    ////////////////////////// GEO-WITHIN ///////////////////////////
+    // in our query we'll use a special operator called "getWithin"
+    // that takes a center coordinates & a radius to get all locations that are within this area...
+
+    // $centerSphere takes an array.. 
+    //      1- array of two element [lng, lat]
+    //      2- radius of the sphere...
+
+    // ================= Important Unit Conversions ================= //
+    // To convert the distance form "miles" to radius or "km" to radian:
+    let radius;
+    if(unit === 'mi') {
+        radius = distance / 3963.2;
+    } else {
+        radius = distance / 6378.1;
+    }
+
+
+    const tours = await Tour.find({ startLocations: {$geoWithin: { $centerSphere: [[lng, lat], radius]}} });
+
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            data: tours
+        }
+    })
+    console.log(distance, lat, lng, unit);
+}
+
+
+
+
+exports.getDistances = catchAsync(async(req, res, next) => {
+    const { distance, latlong, unit } = req.params;
+    const lat = latlong.split(',')[0];
+    const lng = latlong.split(',')[1];
+
+    if(!lat || !lng) {
+        next(new AppError('Please provide latitude and longitude in the format lat,lng.', 400));
+    }
+
+    const multiplier = (unit === 'mi') ? 0.000621371 : 0.001;
+    const distances = await Tour.aggregate(
+        {
+            $getNear: {
+                near: {
+                    type: 'Point',
+                    coordinates: [lng * 1, lat * 1],        // *1 to convert to numbers.
+                },
+                distanceField: 'distance',
+                distanceMultiplier: 0.001       // We specify a number to be multiplied by all distances.
+            }
+        },
+        {
+            $project: {
+                // The names of the fields we want to keep.
+                distance: 1,
+                name: 1,
+
+            }
+        }
+    );
+
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            data: distances 
+        }
+    })
+    console.log(distance, lat, lng, unit);
+})

@@ -183,6 +183,21 @@ tourSchema.index({ price: 1, ratingAverage: -1});
 // If you deleted the index from your code (commented it), it still exists in the database, 
 // So, it's better to delete it from the database manually to use this space.
 
+
+// Create index for startLocations: "Special type ('2dsphere')"..
+tourSchema.index({ startLocations: '2dsphere' });   
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> FOR MORE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< //
+// for more about geographical operators. SEE MongoDB documentation...
+
+
+
+
+
+
+
+ 
+
 // =============================== Virtual Properties ====================================== // 
 // We sometimes need to store some properties like: "distance in Kilometres and Miles"
 // No need to store both them in our database as one can be deriven from the other one..
