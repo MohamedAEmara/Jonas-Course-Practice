@@ -1,11 +1,14 @@
 const express = require('express');
+const multer = require('multer');
 const fs = require('fs');
 const router = express.Router();
 
 
+
 // Another way to import modules from Controllers modules is to name all functions to include..
-const {getAllUsers, getUser, createUser, deleteUser, updateUser, updateMe, deleteMe} = require('./../controllers/userController');
+const {getAllUsers, getUser, createUser, deleteUser, updateUser, updateMe, deleteMe, uploadUserPhoto} = require('./../controllers/userController');
 const authController = require('../controllers/authController');
+const AppError = require('../utils/appError');
 // Let's create a middleware that acesses the parameter id from our URL
 
 router.param('id', (req, res, next, val) => {   // the new added parameter "val" here 
@@ -37,7 +40,7 @@ router.patch ('/resetPassword/:token', authController.resetPassword);
 // All following routes need to be authenticated So, instead of repeating the middleware
 // authController.protect in every route
 // We can use it before all of them here. And this works the same.
-app.use(authController.protect);
+// app.use(authController.protect);
 
 // Now we can remove all protect middleware from the following routes.
 
@@ -46,12 +49,12 @@ router.patch('/updatePassword', authController.updatePassword);
 // And to updatePassword, your first have to attach the "token" in Authorization after "Bearer" 
 
 // GetMe    ==>     Gets all info about logged in user
-router.get('/me', userController.getMe, userController.getUser);
+// router.get('/me', userController.getMe, userController.getUser);
 // Instead of passing my id, I used a middleware to pass the logged-in user-id as a params.
 
 
-
-router.patch('/updateMe', updateMe);
+// upload.single() becauase we want to upload a single file.
+router.patch('/updateMe', uploadUserPhoto, updateMe);
 
 
 router.delete('/deleteMe', deleteMe);

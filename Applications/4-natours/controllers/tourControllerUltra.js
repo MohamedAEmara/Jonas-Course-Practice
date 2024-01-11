@@ -37,12 +37,12 @@ exports.createTour = catchAsync(async (req, res, next) => {
 
 
 
-exports.getAllTours = getAll(Tour);
+exports.getAllTours = factory.getAll(Tour);
 
 
 
 
-exports.getTour = factory.getOne(Tour, { path: review });   // path is the field that the population will be stored in
+exports.getTour = factory.getOne(Tour, { path: 'review' });   // path is the field that the population will be stored in
 
 
 

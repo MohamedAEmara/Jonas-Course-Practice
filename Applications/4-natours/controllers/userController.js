@@ -3,6 +3,43 @@ const catchAsync = require('../utils/catchAsync');
 const User = require('../models/userModel');
 const AppError = require('../utils/appError');
 
+const multer = require('multer');
+
+const multerStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'public/img/users');   // call the callback function with error fields = (null)
+    },
+    filename: (req, file, cb) => {
+        // The file name in the destination will be called..
+        // user-id-timestamb.extenstion...
+        const ext = file.mimetype.split('/')[1];
+        cb(null, `user-${req.user.id}-Date.now().${ext}`);      
+
+    }
+})
+
+
+const multerFilter = (req, file, cb) => {
+    // This function is to test if the uploaded file is an image...
+    
+    // NOTE: any image type not matter it's jpg, png, ... 
+    //      it always starts with (imgage/) in (mimetype) field..
+    if (file.mimetype.startsWith('image')) {
+        cb(null, true);
+    } else {
+        cb(new AppError('Not an image, please upload only image', 400), false);
+    }
+}
+
+
+const upload = multer({
+    storage: multerStorage,
+    fileFilter: multerFilter
+})
+
+
+
+exports.uploadUserPhoto = upload.single('photo');
 
 
 // filterObj(req.body, 'name', 'email');
@@ -77,6 +114,12 @@ exports.deleteUser = (req, res) => {
 
 // updateMe     ==>     updates the currently authenticated user..
 exports.updateMe = (async (req, res, next) => {
+    console.log(req.file);
+    // prints all the information about the file uploaded.
+
+    // NOTE: files are in (req.file) not (req.body)
+    console.log('=-=-=-=-=-=-=-=-=-=-=-=-=-=');
+    console.log(req.body);
     // This is the place we can update data but not "password"
     // "password" in authController
     
