@@ -6,6 +6,10 @@ const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
+const multer = require('multer');
+const sharp = require('sharp');
+
+
 // We will move this function to a new module in "utils" ==> "catchAsync.js"
 /*
 const catchAsync = fn => {
@@ -33,6 +37,7 @@ exports.createTour = catchAsync(async (req, res, next) => {
         }
     }); 
 });
+
 
 
 
@@ -262,3 +267,44 @@ exports.getDistances = catchAsync(async(req, res, next) => {
     })
     console.log(distance, lat, lng, unit);
 })
+
+
+
+
+const multerStorage = multer.memoryStorage();       // Now, the image will be stored as (buffer)
+// and to access the file (req.file.buffer)
+
+const multerFilter = (req, file, cb) => {
+    // This function is to test if the uploaded file is an image...
+    
+    // NOTE: any image type not matter it's jpg, png, ... 
+    //      it always starts with (imgage/) in (mimetype) field..
+    if (file.mimetype.startsWith('image')) {
+        cb(null, true);
+    } else {
+        cb(new AppError('Not an image, please upload only image', 400), false);
+    }
+}
+
+const upload = multer({
+    storage: multerStorage,
+    fileFilter: multerFilter
+});
+
+
+exports.uploadTourImages = upload.fields([
+    // We can add just one (imageCover) & up to 3 image for one tour.
+    { name: 'imageCover', maxCount: 1 },
+    { name: 'images', maxCount: 3 }
+])
+
+// NOTE: 
+/*
+    If we have just one field data to add images we can use this form:
+    upload.array('images', 3);          // (images) is the field name & (3) is the maxCount..
+*/
+
+exports.resizeTourImages = (req, res, next) => {
+    console.log(req.files);     // When you have multiple files, they'll be stored in (req.files) 
+    
+}
