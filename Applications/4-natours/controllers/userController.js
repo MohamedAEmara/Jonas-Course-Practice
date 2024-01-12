@@ -2,22 +2,25 @@
 const catchAsync = require('../utils/catchAsync');
 const User = require('../models/userModel');
 const AppError = require('../utils/appError');
-
+const sharp = require('sharp');         // For resizing images...
 const multer = require('multer');
 
-const multerStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'public/img/users');   // call the callback function with error fields = (null)
-    },
-    filename: (req, file, cb) => {
-        // The file name in the destination will be called..
-        // user-id-timestamb.extenstion...
-        const ext = file.mimetype.split('/')[1];
-        cb(null, `user-${req.user.id}-Date.now().${ext}`);      
+// const multerStorage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//         cb(null, 'public/img/users');   // call the callback function with error fields = (null)
+//     },
+//     filename: (req, file, cb) => {
+//         // The file name in the destination will be called..
+//         // user-id-timestamb.extenstion...
+//         const ext = file.mimetype.split('/')[1];
+//         cb(null, `user-${req.user.id}-Date.now().${ext}`);      
 
-    }
-})
+//     }
+// })
 
+
+const multerStorage = multer.memoryStorage();       // Now, the image will be stored as (buffer)
+// and to access the file (req.file.buffer)
 
 const multerFilter = (req, file, cb) => {
     // This function is to test if the uploaded file is an image...
@@ -41,6 +44,18 @@ const upload = multer({
 
 exports.uploadUserPhoto = upload.single('photo');
 
+exports.resizeUserPhoto = (req, res, next) => {
+    if (!req.file) {
+        return next();
+    }
+    
+    // Save the filename with unique id.. & save it in the (req.file)
+    req.file.filename = `user-${req.user.id}-Date.now().jpeg`;
+
+    // To use sharp() we changed the multer settings to use (memoryStorage) instead of (diskStorage)..
+    sharp(req.file.buffer).resize(500, 500).toFormat('jpeg').jpeg({ quality: 90 }).toFile(`public/img/users/${req.file.filename}`); 
+
+}
 
 // filterObj(req.body, 'name', 'email');
 const filterObj = (bodyObj, ...fields) => {
@@ -130,6 +145,7 @@ exports.updateMe = (async (req, res, next) => {
 
 
     
+
     // 2- If not, we simply update user document..
 
     // We won't take the whole body to update,
@@ -137,6 +153,10 @@ exports.updateMe = (async (req, res, next) => {
     // We actually will let him update the "name" or "mail" ..
 
     const filteredBody = filterObj(req.body, 'name', 'email');  // just keep "name" and "email" fields..
+
+    // Check if there's a photo fields...
+    if (req.file) 
+        filteredBody.photo = req.file.filename;
 
     const user = await User.findByIdAndUpdate(req.user._id, filteredBody, {
         new: true,

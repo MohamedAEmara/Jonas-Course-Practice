@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 // Another way to import modules from Controllers modules is to name all functions to include..
-const {getAllUsers, getUser, createUser, deleteUser, updateUser, updateMe, deleteMe, uploadUserPhoto} = require('./../controllers/userController');
+const {getAllUsers, getUser, createUser, deleteUser, updateUser, updateMe, deleteMe, uploadUserPhoto, resizeUserPhoto} = require('./../controllers/userController');
 const authController = require('../controllers/authController');
 const AppError = require('../utils/appError');
 // Let's create a middleware that acesses the parameter id from our URL
@@ -54,7 +54,7 @@ router.patch('/updatePassword', authController.updatePassword);
 
 
 // upload.single() becauase we want to upload a single file.
-router.patch('/updateMe', uploadUserPhoto, updateMe);
+router.patch('/updateMe', uploadUserPhoto, resizeUserPhoto, updateMe);
 
 
 router.delete('/deleteMe', deleteMe);
