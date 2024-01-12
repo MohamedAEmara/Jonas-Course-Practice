@@ -304,7 +304,43 @@ exports.uploadTourImages = upload.fields([
     upload.array('images', 3);          // (images) is the field name & (3) is the maxCount..
 */
 
-exports.resizeTourImages = (req, res, next) => {
+exports.resizeTourImages = async (req, res, next) => {
     console.log(req.files);     // When you have multiple files, they'll be stored in (req.files) 
     
+    if(!req.files.imageCover || !req.files.images) {
+        return next();
+    }
+
+    // 1- Cover Image:
+    const imageCoverFilename = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+    await sharp(req.files.imageCover[0].buffer)         // [0] because it's an array but has a single element.
+        .resize(2000, 1333)        // 3 : 2
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/tours/${imageCoverFilename}`); 
+
+    req.body.imageCover = imageCoverFilename;           // we saved it in req.body
+    // So that it will automatically updated as it's a fields in (req.body)..
+    
+
+    
+    // 2- Images
+    req.body.images = [];           // declare an empty array in (req.body)
+    // And in each iteration we will add an image to the array.
+
+    // NOTE: we used await & Promise.all to wait for all the array elements to execute first, then move to (next)
+    // otherwise it will go to (next) before finishing the execution of the array.
+    await Promise.all(req.files.images.map(async (file, idx) => {
+        const fileName = `tour-${req.params.id}-${Date.now()}-${idx+1}.jpeg`;
+
+        await sharp(file.buffer) 
+        .resize(2000, 1333)        // 3 : 2
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/tours/${fileName}`); 
+
+        req.body.images.push(filename);  
+    }));
+
+    next();
 }

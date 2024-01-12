@@ -44,7 +44,7 @@ const upload = multer({
 
 exports.uploadUserPhoto = upload.single('photo');
 
-exports.resizeUserPhoto = (req, res, next) => {
+exports.resizeUserPhoto = async (req, res, next) => {
     if (!req.file) {
         return next();
     }
@@ -53,8 +53,12 @@ exports.resizeUserPhoto = (req, res, next) => {
     req.file.filename = `user-${req.user.id}-Date.now().jpeg`;
 
     // To use sharp() we changed the multer settings to use (memoryStorage) instead of (diskStorage)..
-    sharp(req.file.buffer).resize(500, 500).toFormat('jpeg').jpeg({ quality: 90 }).toFile(`public/img/users/${req.file.filename}`); 
+    await sharp(req.file.buffer).resize(500, 500).toFormat('jpeg').jpeg({ quality: 90 }).toFile(`public/img/users/${req.file.filename}`); 
+    // (sharp) returns a promise. so, we need to await for it
 
+    // Otherwise, it will go to next() without processing the image.
+
+    next();
 }
 
 // filterObj(req.body, 'name', 'email');
