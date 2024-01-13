@@ -20,6 +20,7 @@ const rateLimit = require('express-rate-limit');
 // const tourRouter = require(`${__dirname}/routes/tourRoutes`);
 const tourRouter = require('./routes/tourRoutesPro');
 const userRouter = require('./routes/userRoutes');
+const bookingRouter = require('./routes/bookingRoutes');
 
 const AppError = require('./utils/appError');
 const errorController = require('./controllers/errorController');
@@ -82,7 +83,7 @@ app.use('/api/', limiter)       // only use "limiter" on requests from "/api"
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
-
+app.use('/api/v1/bookings', bookingRouter);
 // If I add any middleware here after app.use() .. this means this route is not handled by each of the above routers..
 
 

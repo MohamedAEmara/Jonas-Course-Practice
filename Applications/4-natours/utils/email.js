@@ -52,6 +52,10 @@ module.exports = class Email {
     async sendWelcom() {
         await this.send('Welcome', 'Welcome to our App :)');
     }
+
+    async sendPasswordReset() {
+        await this.send('passwordReset', 'Your password reset token (valid for only 10 mins)');
+    }
 } 
 
 const sendEmail = async options => {
